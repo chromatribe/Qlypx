@@ -1,0 +1,15 @@
+strings:
+  inputs: Qlypx/Resources/en.lproj/Localizable.strings
+  outputs:
+    templateName: structured-swift4
+    output: Qlypx/Generated/LocalizedStrings.swift
+xcassets:
+  inputs: Qlypx/Resources/Images.xcassets
+  outputs:
+    templateName: swift4
+    output: Qlypx/Generated/AssetsImages.swift
+colors:
+  inputs: Qlypx/Resources/colors.txt
+  outputs:
+    templateName: swift4
+    output: Qlypx/Generated/Colors.swift

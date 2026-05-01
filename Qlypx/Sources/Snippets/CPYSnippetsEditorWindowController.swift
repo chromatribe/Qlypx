@@ -67,13 +67,15 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
         case exportCSV = "Export CSV"
 
         var identifier: NSToolbarItem.Identifier { NSToolbarItem.Identifier(self.rawValue) }
-        var title: String { self.rawValue }
+        var title: String {
+            return NSLocalizedString(self.rawValue, comment: "")
+        }
         var symbol: String {
             switch self {
             case .addFolder: return "folder.badge.plus"
             case .addSnippet: return "doc.badge.plus"
             case .delete: return "trash"
-            case .changeStatus: return "checkmark.circle"
+            case .changeStatus: return "switch.2"
             case .importCSV: return "square.and.arrow.down"
             case .exportCSV: return "square.and.arrow.up"
             }
@@ -247,7 +249,7 @@ extension CPYSnippetsEditorWindowController {
     private func setupToolbar() {
         let toolbar = NSToolbar(identifier: "SnippetsToolbar")
         toolbar.delegate = self
-        toolbar.displayMode = .iconAndLabel
+        toolbar.displayMode = .iconOnly
         toolbar.allowsUserCustomization = true
         toolbar.autosavesConfiguration = true
         window?.toolbar = toolbar

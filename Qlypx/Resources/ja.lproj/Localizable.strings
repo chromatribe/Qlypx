@@ -57,3 +57,10 @@
 "To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "この動作を行うためにはシステム環境設定の\"セキュリティとプライバシー\"環境設定で、Qlypxへのアクセシビリティのアクセスを許可してください。";
 
 "Open System Preferences" = "\"システム環境設定\"を開く";
+
+"Add Folder" = "フォルダ追加";
+"Add Snippet" = "スニペット追加";
+"Delete" = "削除";
+"Enable/Disable" = "有効/無効の切り替え";
+"Import CSV" = "CSVインポート";
+"Export CSV" = "CSVエクスポート";

@@ -11,9 +11,8 @@
 //
 
 import Cocoa
-import SwiftHEXColors
 
-final class CPYClipData: NSObject {
+final class CPYClipData: NSObject, NSCoding {
 
     // MARK: - Properties
     fileprivate let kTypesKey       = "types"
@@ -90,7 +89,11 @@ final class CPYClipData: NSObject {
                 .deprecatedPDF,
                 .deprecatedFilenames,
                 .deprecatedURL,
-                .deprecatedTIFF]
+                .deprecatedTIFF,
+                .tiff,
+                .png,
+                NSPasteboard.PasteboardType("public.jpeg"),
+                NSPasteboard.PasteboardType("com.compuserve.gif")]
     }
     static var availableTypesString: [String] {
         return ["String",
@@ -104,6 +107,11 @@ final class CPYClipData: NSObject {
     static var availableTypesDictinary: [NSPasteboard.PasteboardType: String] {
         var availableTypes = [NSPasteboard.PasteboardType: String]()
         zip(CPYClipData.availableTypes, CPYClipData.availableTypesString).forEach { availableTypes[$0] = $1 }
+        // Map modern types to existing "TIFF" setting
+        availableTypes[.tiff] = "TIFF"
+        availableTypes[.png] = "TIFF"
+        availableTypes[NSPasteboard.PasteboardType("public.jpeg")] = "TIFF"
+        availableTypes[NSPasteboard.PasteboardType("com.compuserve.gif")] = "TIFF"
         return availableTypes
     }
 
@@ -128,15 +136,17 @@ final class CPYClipData: NSObject {
             case .deprecatedURL:
                 guard let urls = pasteboard.propertyList(forType: .deprecatedURL) as? [String] else { return }
                 URLs = urls
-            case .deprecatedTIFF:
-                image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage
+            case .deprecatedTIFF, .tiff, .png, NSPasteboard.PasteboardType("public.jpeg"), NSPasteboard.PasteboardType("com.compuserve.gif"):
+                if image == nil {
+                    image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage
+                }
             default: break
             }
         }
     }
 
     init(image: NSImage) {
-        self.types = [.deprecatedTIFF]
+        self.types = [.deprecatedTIFF, .tiff, .png, NSPasteboard.PasteboardType("public.jpeg"), NSPasteboard.PasteboardType("com.compuserve.gif")]
         self.image = image
     }
 
@@ -147,7 +157,7 @@ final class CPYClipData: NSObject {
     }
 
     // MARK: - NSCoding
-    @objc func encodeWithCoder(_ aCoder: NSCoder) {
+    func encode(with aCoder: NSCoder) {
         aCoder.encode(types.map { $0.rawValue }, forKey: kTypesKey)
         aCoder.encode(stringValue, forKey: kStringValueKey)
         aCoder.encode(RTFData, forKey: kRTFDataKey)
@@ -157,7 +167,7 @@ final class CPYClipData: NSObject {
         aCoder.encode(image, forKey: kImageKey)
     }
 
-    @objc required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         types = (aDecoder.decodeObject(forKey: kTypesKey) as? [String])?.compactMap { NSPasteboard.PasteboardType(rawValue: $0) } ?? []
         fileNames = aDecoder.decodeObject(forKey: kFileNamesKey) as? [String] ?? [String]()
         URLs = aDecoder.decodeObject(forKey: kURLsKey) as? [String] ?? [String]()

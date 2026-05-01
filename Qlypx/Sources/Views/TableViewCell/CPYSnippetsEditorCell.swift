@@ -20,7 +20,7 @@ final class CPYSnippetsEditorCell: NSTextFieldCell {
     var isItemEnabled = false
     override var cellSize: NSSize {
         var size = super.cellSize
-        size.width += 3.0 + 16.0
+        size.width += 20.0 // Adjusted for icon space
         return size
     }
 
@@ -54,14 +54,23 @@ final class CPYSnippetsEditorCell: NSTextFieldCell {
             imageFrame.origin.y += 5
             imageFrame.size = NSSize(width: 16, height: 13)
 
-            let drawImage = (isHighlighted) ? Asset.snippetsIconFolderWhite.image : Asset.snippetsIconFolderBlue.image
-            drawImage.size = NSSize(width: 16, height: 13)
+            let drawImage: NSImage
+            if #available(macOS 12.0, *) {
+                let color: NSColor = (isHighlighted) ? .white : .systemBlue
+                let config = NSImage.SymbolConfiguration(hierarchicalColor: color)
+                drawImage = NSImage(systemSymbolName: "folder.fill", accessibilityDescription: nil)?
+                    .withSymbolConfiguration(config) ?? NSImage()
+            } else {
+                drawImage = NSImage(systemSymbolName: "folder.fill", accessibilityDescription: nil) ?? NSImage()
+            }
+
             drawImage.draw(in: imageFrame, from: NSRect.zero, operation: .sourceOver, fraction: 1.0, respectFlipped: true, hints: nil)
 
             newFrame = cellFrame
-            newFrame.origin.x += 8
-            newFrame.origin.y += 2
-            newFrame.size.height -= 2
+            newFrame.origin.x += 20 // Move text to the right of the icon
+            newFrame.size.width -= 20
+            newFrame.origin.y += 1
+            newFrame.size.height -= 1
         case .none:
             newFrame = cellFrame
             newFrame.origin.y += 2
@@ -101,9 +110,10 @@ final class CPYSnippetsEditorCell: NSTextFieldCell {
             imageFrame.origin.y += ceil((cellRect.size.height - imageFrame.size.height) / 2)
 
             var newFrame = cellRect
-            newFrame.origin.x += 10
-            newFrame.origin.y += 2
-            newFrame.size.height -= 2
+            newFrame.origin.x += 20
+            newFrame.size.width -= 20
+            newFrame.origin.y += 1
+            newFrame.size.height -= 1
 
             return newFrame
 

@@ -16,80 +16,135 @@ final class CPYPreferencesWindowController: NSWindowController {
 
     // MARK: - Properties
     static let sharedController = CPYPreferencesWindowController(windowNibName: "CPYPreferencesWindowController")
-    @IBOutlet private weak var toolBar: NSView!
-    // ImageViews
-    @IBOutlet private weak var generalImageView: NSImageView!
-    @IBOutlet private weak var menuImageView: NSImageView!
-    @IBOutlet private weak var typeImageView: NSImageView!
-    @IBOutlet private weak var excludeImageView: NSImageView!
-    @IBOutlet private weak var shortcutsImageView: NSImageView!
-    @IBOutlet private weak var updatesImageView: NSImageView!
-    @IBOutlet private weak var betaImageView: NSImageView!
-    // Labels
-    @IBOutlet private weak var generalTextField: NSTextField!
-    @IBOutlet private weak var menuTextField: NSTextField!
-    @IBOutlet private weak var typeTextField: NSTextField!
-    @IBOutlet private weak var excludeTextField: NSTextField!
-    @IBOutlet private weak var shortcutsTextField: NSTextField!
-    @IBOutlet private weak var updatesTextField: NSTextField!
-    @IBOutlet private weak var betaTextField: NSTextField!
-    // Buttons
-    @IBOutlet private weak var generalButton: NSButton!
-    @IBOutlet private weak var menuButton: NSButton!
-    @IBOutlet private weak var typeButton: NSButton!
-    @IBOutlet private weak var excludeButton: NSButton!
-    @IBOutlet private weak var shortcutsButton: NSButton!
-    @IBOutlet private weak var updatesButton: NSButton!
-    @IBOutlet private weak var betaButton: NSButton!
-    // ViewController
-    private let viewController = [NSViewController(nibName: "CPYGeneralPreferenceViewController", bundle: nil),
-                                  NSViewController(nibName: "CPYMenuPreferenceViewController", bundle: nil),
-                                  CPYTypePreferenceViewController(nibName: "CPYTypePreferenceViewController", bundle: nil),
-                                  CPYExcludeAppPreferenceViewController(nibName: "CPYExcludeAppPreferenceViewController", bundle: nil),
-                                  CPYShortcutsPreferenceViewController(nibName: "CPYShortcutsPreferenceViewController", bundle: nil),
-                                  CPYUpdatesPreferenceViewController(nibName: "CPYUpdatesPreferenceViewController", bundle: nil),
-                                  CPYBetaPreferenceViewController(nibName: "CPYBetaPreferenceViewController", bundle: nil)]
+    
+    private let viewControllers = [
+        NSViewController(nibName: "CPYGeneralPreferenceViewController", bundle: nil),
+        NSViewController(nibName: "CPYMenuPreferenceViewController", bundle: nil),
+        CPYTypePreferenceViewController(nibName: "CPYTypePreferenceViewController", bundle: nil),
+        CPYExcludeAppPreferenceViewController(nibName: "CPYExcludeAppPreferenceViewController", bundle: nil),
+        CPYShortcutsPreferenceViewController(nibName: "CPYShortcutsPreferenceViewController", bundle: nil)
+    ]
+
+    private enum ToolbarItem: String, CaseIterable {
+        case general = "General"
+        case menu = "Menu"
+        case type = "Type"
+        case exclude = "Exclude"
+        case shortcuts = "Shortcuts"
+
+        var identifier: NSToolbarItem.Identifier {
+            NSToolbarItem.Identifier(self.rawValue)
+        }
+
+        var title: String {
+            self.rawValue // Can be localized later
+        }
+
+        var symbol: String {
+            switch self {
+            case .general: return "gearshape"
+            case .menu: return "list.bullet.rectangle"
+            case .type: return "doc.on.doc"
+            case .exclude: return "nosign"
+            case .shortcuts: return "keyboard"
+            }
+        }
+    }
 
     // MARK: - Window Life Cycle
     override func windowDidLoad() {
         super.windowDidLoad()
+        
         self.window?.collectionBehavior = .canJoinAllSpaces
-        self.window?.backgroundColor = NSColor(white: 0.99, alpha: 1)
-        if #available(OSX 10.10, *) {
+        
+        // Apply modern macOS 11+ window styles
+        if #available(macOS 11.0, *) {
+            self.window?.toolbarStyle = .preference
+        } else {
             self.window?.titlebarAppearsTransparent = true
         }
-        toolBarItemTapped(generalButton)
-        generalButton.sendAction(on: .leftMouseDown)
-        menuButton.sendAction(on: .leftMouseDown)
-        typeButton.sendAction(on: .leftMouseDown)
-        excludeButton.sendAction(on: .leftMouseDown)
-        shortcutsButton.sendAction(on: .leftMouseDown)
-        updatesButton.sendAction(on: .leftMouseDown)
-        betaButton.sendAction(on: .leftMouseDown)
+        self.window?.backgroundColor = NSColor.windowBackgroundColor
+        self.window?.isOpaque = true
+        self.window?.contentView?.wantsLayer = true
+        self.window?.contentView?.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
+        self.window?.makeFirstResponder(nil)
+
+        setupToolbar()
+        
+        // Select initial tab
+        if let firstItem = ToolbarItem.allCases.first {
+            window?.toolbar?.selectedItemIdentifier = firstItem.identifier
+            switchView(index: 0, animate: false)
+        }
     }
 
     override func showWindow(_ sender: Any?) {
         super.showWindow(sender)
         window?.makeKeyAndOrderFront(self)
     }
+
+    // MARK: - Setup
+    private func setupToolbar() {
+        let toolbar = NSToolbar(identifier: "PreferencesToolbar")
+        toolbar.delegate = self
+        toolbar.displayMode = .iconAndLabel
+        toolbar.allowsUserCustomization = false
+        toolbar.autosavesConfiguration = false
+        window?.toolbar = toolbar
+    }
 }
 
-// MARK: - IBActions
-extension CPYPreferencesWindowController {
-    @IBAction private func toolBarItemTapped(_ sender: NSButton) {
-        selectedTab(sender.tag)
-        switchView(sender.tag)
+// MARK: - NSToolbarDelegate
+extension CPYPreferencesWindowController: NSToolbarDelegate {
+    
+    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return ToolbarItem.allCases.map { $0.identifier }
+    }
+
+    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return ToolbarItem.allCases.map { $0.identifier }
+    }
+
+    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return ToolbarItem.allCases.map { $0.identifier }
+    }
+
+    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+        
+        guard let tabItem = ToolbarItem(rawValue: itemIdentifier.rawValue) else { return nil }
+        
+        let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+        item.label = tabItem.title
+        item.paletteLabel = tabItem.title
+        item.target = self
+        item.action = #selector(toolbarItemSelected(_:))
+        
+        if #available(macOS 11.0, *) {
+            item.image = NSImage(systemSymbolName: tabItem.symbol, accessibilityDescription: tabItem.title)
+        } else {
+            // Fallback for older macOS versions (though target is 13.0, this is safe)
+            item.image = NSImage(named: NSImage.preferencesGeneralName)
+        }
+        
+        return item
+    }
+    
+    @objc private func toolbarItemSelected(_ sender: NSToolbarItem) {
+        guard let tabItem = ToolbarItem(rawValue: sender.itemIdentifier.rawValue),
+              let index = ToolbarItem.allCases.firstIndex(of: tabItem) else { return }
+        switchView(index: index)
     }
 }
 
 // MARK: - NSWindow Delegate
 extension CPYPreferencesWindowController: NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
-        if let viewController = viewController[2] as? CPYTypePreferenceViewController {
+        if let viewController = viewControllers[2] as? CPYTypePreferenceViewController {
             AppEnvironment.current.defaults.set(viewController.storeTypes, forKey: Constants.UserDefaults.storeTypes)
             AppEnvironment.current.defaults.synchronize()
         }
-        if let window = window, !window.makeFirstResponder(window) {
+        if let window = window {
+            window.makeFirstResponder(nil)
             window.endEditing(for: nil)
         }
         NSApp.deactivate()
@@ -98,68 +153,40 @@ extension CPYPreferencesWindowController: NSWindowDelegate {
 
 // MARK: - Layout
 private extension CPYPreferencesWindowController {
-    func resetImages() {
-        generalImageView.image = Asset.prefGeneral.image
-        menuImageView.image = Asset.prefMenu.image
-        typeImageView.image = Asset.prefType.image
-        excludeImageView.image = Asset.prefExcluded.image
-        shortcutsImageView.image = Asset.prefShortcut.image
-        updatesImageView.image = Asset.prefUpdate.image
-        betaImageView.image = Asset.prefBeta.image
+    
+    func switchView(index: Int, animate: Bool = false) {
+        guard index >= 0 && index < viewControllers.count else { return }
+        let newView = viewControllers[index].view
+        
+        guard let currentWindow = window, let contentView = currentWindow.contentView else { return }
 
-        generalTextField.textColor = ColorName.tabTitle.color
-        menuTextField.textColor = ColorName.tabTitle.color
-        typeTextField.textColor = ColorName.tabTitle.color
-        excludeTextField.textColor = ColorName.tabTitle.color
-        shortcutsTextField.textColor = ColorName.tabTitle.color
-        updatesTextField.textColor = ColorName.tabTitle.color
-        betaTextField.textColor = ColorName.tabTitle.color
-    }
-
-    func selectedTab(_ index: Int) {
-        resetImages()
-
-        switch index {
-        case 0:
-            generalImageView.image = Asset.prefGeneralOn.image
-            generalTextField.textColor = ColorName.qlypx.color
-        case 1:
-            menuImageView.image = Asset.prefMenuOn.image
-            menuTextField.textColor = ColorName.qlypx.color
-        case 2:
-            typeImageView.image = Asset.prefTypeOn.image
-            typeTextField.textColor = ColorName.qlypx.color
-        case 3:
-            excludeImageView.image = Asset.prefExcludedOn.image
-            excludeTextField.textColor = ColorName.qlypx.color
-        case 4:
-            shortcutsImageView.image = Asset.prefShortcutOn.image
-            shortcutsTextField.textColor = ColorName.qlypx.color
-        case 5:
-            updatesImageView.image = Asset.prefUpdateOn.image
-            updatesTextField.textColor = ColorName.qlypx.color
-        case 6:
-            betaImageView.image = Asset.prefBetaOn.image
-            betaTextField.textColor = ColorName.qlypx.color
-        default: break
+        // 1. レイヤーと背景色の設定
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
+        currentWindow.backgroundColor = NSColor.windowBackgroundColor
+        currentWindow.isOpaque = true
+        
+        // 2. 念のためフォーカスを外す
+        currentWindow.makeFirstResponder(nil)
+        
+        // 3. ビューの入れ替え
+        contentView.subviews.forEach { $0.removeFromSuperview() }
+        contentView.addSubview(newView)
+        newView.frame = contentView.bounds
+        newView.autoresizingMask = [.width, .height]
+        
+        // 4. 新しいフレームの計算と適用
+        var newFrame = currentWindow.frameRect(forContentRect: newView.frame)
+        let oldFrame = currentWindow.frame
+        newFrame.origin.y = oldFrame.origin.y + oldFrame.size.height - newFrame.size.height
+        newFrame.origin.x = oldFrame.origin.x
+        
+        // アニメーションを無効化（ちらつき防止の確実な策）
+        currentWindow.setFrame(newFrame, display: true, animate: animate)
+        
+        // 5. 最後にフォーカスを移す
+        DispatchQueue.main.async {
+            currentWindow.makeFirstResponder(newView)
         }
-    }
-
-    func switchView(_ index: Int) {
-        let newView = viewController[index].view
-        // Remove current views without toolbar
-        window?.contentView?.subviews.forEach { view in
-            if view != toolBar {
-                view.removeFromSuperview()
-            }
-        }
-        // Resize view
-        let frame = window!.frame
-        var newFrame = window!.frameRect(forContentRect: newView.frame)
-        newFrame.origin = frame.origin
-        newFrame.origin.y += frame.height - newFrame.height - toolBar.frame.height
-        newFrame.size.height += toolBar.frame.height
-        window?.setFrame(newFrame, display: true)
-        window?.contentView?.addSubview(newView)
     }
 }

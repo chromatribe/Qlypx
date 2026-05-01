@@ -11,48 +11,51 @@
 //
 
 import Cocoa
-import RealmSwift
 
-final class CPYSnippet: Object {
+final class CPYSnippet: Codable, Equatable, Hashable {
+    var index: Int = 0
+    var enable: Bool = true
+    var title: String = ""
+    var content: String = ""
+    var identifier: String = UUID().uuidString
 
-    // MARK: - Properties
-    @objc dynamic var index = 0
-    @objc dynamic var enable = true
-    @objc dynamic var title = ""
-    @objc dynamic var content = ""
-    @objc dynamic var identifier = UUID().uuidString
-    let folders = LinkingObjects(fromType: CPYFolder.self, property: "snippets")
-
-    var folder: CPYFolder? {
-        return folders.first
+    init(index: Int = 0, enable: Bool = true, title: String = "", content: String = "", identifier: String = UUID().uuidString) {
+        self.index = index
+        self.enable = enable
+        self.title = title
+        self.content = content
+        self.identifier = identifier
     }
 
-    // MARK: Primary Key
-    override static func primaryKey() -> String? {
-        return "identifier"
+    static func == (lhs: CPYSnippet, rhs: CPYSnippet) -> Bool {
+        return lhs.identifier == rhs.identifier
     }
 
-    // MARK: - Ignore Properties
-    override static func ignoredProperties() -> [String] {
-        return ["folder"]
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
     }
-
 }
 
-// MARK: - Add Snippet
+// MARK: - Actions
 extension CPYSnippet {
     func merge() {
-        let realm = try! Realm()
-        let copySnippet = CPYSnippet(value: self)
-        realm.transaction { realm.add(copySnippet, update: .all) }
+        // Find folder and update
+        for folder in AppEnvironment.current.dataService.folders {
+            if let index = folder.snippets.firstIndex(where: { $0.identifier == identifier }) {
+                folder.snippets[index] = self
+                AppEnvironment.current.dataService.upsertFolder(folder)
+                return
+            }
+        }
     }
-}
 
-// MARK: - Remove Snippet
-extension CPYSnippet {
     func remove() {
-        let realm = try! Realm()
-        guard let snippet = realm.object(ofType: CPYSnippet.self, forPrimaryKey: identifier) else { return }
-        snippet.realm?.transaction { snippet.realm?.delete(snippet) }
+        for folder in AppEnvironment.current.dataService.folders {
+            if let index = folder.snippets.firstIndex(where: { $0.identifier == identifier }) {
+                folder.snippets.remove(at: index)
+                AppEnvironment.current.dataService.upsertFolder(folder)
+                return
+            }
+        }
     }
 }

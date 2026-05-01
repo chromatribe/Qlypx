@@ -36,54 +36,70 @@ struct AppEnvironment {
         stack.remove(at: stack.count - 2)
     }
 
-    static func push(clipService: ClipService = current.clipService,
+    static func push(dataService: DataService = current.dataService,
+                     clipService: ClipService = current.clipService,
                      hotKeyService: HotKeyService = current.hotKeyService,
                      dataCleanService: DataCleanService = current.dataCleanService,
                      pasteService: PasteService = current.pasteService,
                      excludeAppService: ExcludeAppService = current.excludeAppService,
                      accessibilityService: AccessibilityService = current.accessibilityService,
+                     updateService: UpdateService = current.updateService,
                      menuManager: MenuManager = current.menuManager,
                      defaults: UserDefaults = current.defaults) {
-        push(environment: Environment(clipService: clipService,
+        push(environment: Environment(dataService: dataService,
+                                      clipService: clipService,
                                       hotKeyService: hotKeyService,
                                       dataCleanService: dataCleanService,
                                       pasteService: pasteService,
                                       excludeAppService: excludeAppService,
                                       accessibilityService: accessibilityService,
+                                      updateService: updateService,
                                       menuManager: menuManager,
                                       defaults: defaults))
     }
 
-    static func replaceCurrent(clipService: ClipService = current.clipService,
+    static func replaceCurrent(dataService: DataService = current.dataService,
+                               clipService: ClipService = current.clipService,
                                hotKeyService: HotKeyService = current.hotKeyService,
                                dataCleanService: DataCleanService = current.dataCleanService,
                                pasteService: PasteService = current.pasteService,
                                excludeAppService: ExcludeAppService = current.excludeAppService,
                                accessibilityService: AccessibilityService = current.accessibilityService,
+                               updateService: UpdateService = current.updateService,
                                menuManager: MenuManager = current.menuManager,
                                defaults: UserDefaults = current.defaults) {
-        replaceCurrent(environment: Environment(clipService: clipService,
+        replaceCurrent(environment: Environment(dataService: dataService,
+                                                clipService: clipService,
                                                 hotKeyService: hotKeyService,
                                                 dataCleanService: dataCleanService,
                                                 pasteService: pasteService,
                                                 excludeAppService: excludeAppService,
                                                 accessibilityService: accessibilityService,
+                                                updateService: updateService,
                                                 menuManager: menuManager,
                                                 defaults: defaults))
     }
 
     static func fromStorage(defaults: UserDefaults = .standard) -> Environment {
         var excludeApplications = [CPYAppInfo]()
-        if let data = defaults.object(forKey: Constants.UserDefaults.excludeApplications) as? Data, let applications = NSKeyedUnarchiver.unarchiveObject(with: data) as? [CPYAppInfo] {
-            excludeApplications = applications
+        if let data = defaults.object(forKey: Constants.UserDefaults.excludeApplications) as? Data {
+            do {
+                if let applications = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSArray.self, CPYAppInfo.self], from: data) as? [CPYAppInfo] {
+                    excludeApplications = applications
+                }
+            } catch {
+                QlyLogger.error("Failed to unarchive excludeApplications: \(error)", log: .environment)
+            }
         }
         let excludeAppService = ExcludeAppService(applications: excludeApplications)
-        return Environment(clipService: current.clipService,
+        return Environment(dataService: current.dataService,
+                           clipService: current.clipService,
                            hotKeyService: current.hotKeyService,
                            dataCleanService: current.dataCleanService,
                            pasteService: current.pasteService,
                            excludeAppService: excludeAppService,
                            accessibilityService: current.accessibilityService,
+                           updateService: current.updateService,
                            menuManager: current.menuManager,
                            defaults: current.defaults)
     }

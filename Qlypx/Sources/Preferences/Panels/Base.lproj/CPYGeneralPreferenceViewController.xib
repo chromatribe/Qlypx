@@ -158,6 +158,9 @@
                                 <menuItem image="statusbar_menu_white" tag="2" id="4uk-Hs-aGn">
                                     <modifierMask key="keyEquivalentModifierMask"/>
                                 </menuItem>
+                                <menuItem image="statusbar_menu_copy" tag="3" id="copy-icon-item">
+                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                </menuItem>
                                 <menuItem title="None" id="aEh-u0-hQR">
                                     <modifierMask key="keyEquivalentModifierMask"/>
                                 </menuItem>
@@ -176,5 +179,6 @@
     <resources>
         <image name="statusbar_menu_black" width="18" height="18"/>
         <image name="statusbar_menu_white" width="18" height="18"/>
+        <image name="statusbar_menu_copy" width="18" height="18"/>
     </resources>
 </document>

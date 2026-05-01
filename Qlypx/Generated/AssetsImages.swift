@@ -51,6 +51,7 @@ internal enum Asset {
   internal static let snippetsImportOn = ImageAsset(name: "snippets_import_on")
   internal static let statusbarMenuBlack = ImageAsset(name: "statusbar_menu_black")
   internal static let statusbarMenuWhite = ImageAsset(name: "statusbar_menu_white")
+  internal static let statusbarMenuCopy = ImageAsset(name: "statusbar_menu_copy")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

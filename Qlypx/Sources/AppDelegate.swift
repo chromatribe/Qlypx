@@ -11,35 +11,26 @@
 //
 
 import Cocoa
-import Sparkle
-import RxCocoa
-import RxSwift
+import Combine
 import ServiceManagement
 import Magnet
-import Screeen
-import RxScreeen
-import RealmSwift
-
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSMenuItemValidation {
 
     // MARK: - Properties
     let screenshotObserver = ScreenShotObserver()
-    let disposeBag = DisposeBag()
+    var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Migrate Realm
-        Realm.migration()
     }
 
     // MARK: - NSMenuItem Validation
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(AppDelegate.clearAllHistory) {
-            let realm = try! Realm()
-            return !realm.objects(CPYClip.self).isEmpty
+            return !AppEnvironment.current.dataService.clips.isEmpty
         }
         return true
     }
@@ -97,8 +88,7 @@ class AppDelegate: NSObject, NSMenuItemValidation {
             NSSound.beep()
             return
         }
-        let realm = try! Realm()
-        guard let clip = realm.object(ofType: CPYClip.self, forPrimaryKey: primaryKey) else {
+        guard let clip = AppEnvironment.current.dataService.clips.first(where: { $0.dataHash == primaryKey }) else {
             CPYUtilities.sendCustomLog(with: "Cannot fetch clip data")
             NSSound.beep()
             return
@@ -114,8 +104,16 @@ class AppDelegate: NSObject, NSMenuItemValidation {
             NSSound.beep()
             return
         }
-        let realm = try! Realm()
-        guard let snippet = realm.object(ofType: CPYSnippet.self, forPrimaryKey: primaryKey) else {
+        
+        var foundSnippet: CPYSnippet?
+        for folder in AppEnvironment.current.dataService.folders {
+            if let snippet = folder.snippets.first(where: { $0.identifier == primaryKey }) {
+                foundSnippet = snippet
+                break
+            }
+        }
+        
+        guard let snippet = foundSnippet else {
             CPYUtilities.sendCustomLog(with: "Cannot fetch snippet data")
             NSSound.beep()
             return
@@ -177,30 +175,32 @@ class AppDelegate: NSObject, NSMenuItemValidation {
 extension AppDelegate: NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        QlyLogger.info("Application did finish launching")
         // Environments
         AppEnvironment.replaceCurrent(environment: AppEnvironment.fromStorage())
+        QlyLogger.debug("AppEnvironment replaced", log: .environment)
         // UserDefaults
         CPYUtilities.registerUserDefaultKeys()
         // SDKs
         CPYUtilities.initSDKs()
         // Check Accessibility Permission
-        AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
+        let isAccessibilityEnabled = AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
+        QlyLogger.info("Accessibility enabled: \(isAccessibilityEnabled)")
+        // Check for Updates
+        if AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck) {
+            AppEnvironment.current.updateService.checkForUpdates()
+        }
 
         // Show Login Item
         if !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.loginItem) && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.suppressAlertForLoginItem) {
             promptToAddLoginItems()
         }
 
-        // Sparkle (Temporarily disabled for Phase 1 to bypass EdDSA key requirement)
-        // let updater = SUUpdater.shared()
-        // updater?.feedURL = Constants.Application.appcastURL
-        // updater?.automaticallyChecksForUpdates = AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck)
-        // updater?.updateCheckInterval = TimeInterval(AppEnvironment.current.defaults.integer(forKey: Constants.Update.checkInterval))
-
         // Binding Events
         bind()
 
         // Services
+        QlyLogger.debug("Starting services")
         AppEnvironment.current.clipService.startMonitoring()
         AppEnvironment.current.dataCleanService.startMonitoring()
         AppEnvironment.current.excludeAppService.startMonitoring()
@@ -208,6 +208,10 @@ extension AppDelegate: NSApplicationDelegate {
 
         // Managers
         AppEnvironment.current.menuManager.setup()
+        
+        // Screenshot Observer
+        screenshotObserver.delegate = self
+        QlyLogger.debug("Screenshot observer delegate set")
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -218,34 +222,24 @@ extension AppDelegate: NSApplicationDelegate {
 // MARK: - Bind
 private extension AppDelegate {
     func bind() {
+        cancellables = []
         // Login Item
-        AppEnvironment.current.defaults.rx.observe(Bool.self, Constants.UserDefaults.loginItem, retainSelf: false)
+        AppEnvironment.current.defaults.qly_observe(Bool.self, Constants.UserDefaults.loginItem)
             .compactMap { $0 }
-            .subscribe(onNext: { [weak self] _ in
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] (_: Bool) in
                 self?.reflectLoginItemState()
-            })
-            .disposed(by: disposeBag)
-        // Observe Screenshot
-        let observerScreenshot = AppEnvironment.current.defaults.rx.observe(Bool.self, Constants.Beta.observerScreenshot, retainSelf: false)
-            .compactMap { $0 }
-            .share(replay: 1)
-        observerScreenshot
-            .subscribe(onNext: { [weak self] enabled in
-                self?.screenshotObserver.isEnabled = enabled
-            })
-            .disposed(by: disposeBag)
-        observerScreenshot
-            .filter { $0 }
-            .take(1)
-            .subscribe(onNext: { [weak self] _ in
-                self?.screenshotObserver.start()
-            })
-            .disposed(by: disposeBag)
-        // Observe Screenshot image
-        screenshotObserver.rx.addedImage
-            .subscribe(onNext: { image in
-                AppEnvironment.current.clipService.create(with: image)
-            })
-            .disposed(by: disposeBag)
+            }
+            .store(in: &cancellables)
+
+    }
+}
+
+// MARK: - ScreenShotObserverDelegate
+extension AppDelegate: ScreenShotObserverDelegate {
+    func screenShotObserver(_ observer: ScreenShotObserver, addedItem item: NSMetadataItem) {
+        guard let path = item.value(forAttribute: NSMetadataItemPathKey) as? String else { return }
+        guard let image = NSImage(contentsOfFile: path) else { return }
+        AppEnvironment.current.clipService.create(with: image)
     }
 }

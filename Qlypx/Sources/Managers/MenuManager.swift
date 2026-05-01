@@ -11,10 +11,8 @@
 //
 
 import Cocoa
-import PINCache
-import RealmSwift
-import RxCocoa
-import RxSwift
+import Combine
+import Magnet
 
 final class MenuManager: NSObject {
 
@@ -25,22 +23,22 @@ final class MenuManager: NSObject {
     fileprivate var snippetMenu: NSMenu?
     // StatusMenu
     fileprivate var statusItem: NSStatusItem?
+    fileprivate var currentStatusType: StatusType?
     // Icon Cache
     fileprivate let folderIcon = Asset.iconFolder.image
     fileprivate let snippetIcon = Asset.iconText.image
     // Other
-    fileprivate let disposeBag = DisposeBag()
+    fileprivate var cancellables = Set<AnyCancellable>()
     fileprivate let notificationCenter = NotificationCenter.default
     fileprivate let kMaxKeyEquivalents = 10
     fileprivate let shortenSymbol = "..."
-    // Realm
-    fileprivate let realm = try! Realm()
-    fileprivate var clipToken: NotificationToken?
-    fileprivate var snippetToken: NotificationToken?
 
     // MARK: - Enum Values
     enum StatusType: Int {
-        case none, black, white
+        case none = 0
+        case clipboard = 1
+        case arrow = 2
+        case copy = 3
     }
 
     // MARK: - Initialize
@@ -53,6 +51,8 @@ final class MenuManager: NSObject {
     }
 
     func setup() {
+        QlyLogger.debug("Setting up MenuManager", log: .menu)
+        createClipMenu()
         bind()
     }
 
@@ -61,6 +61,7 @@ final class MenuManager: NSObject {
 // MARK: - Popup Menu
 extension MenuManager {
     func popUpMenu(_ type: MenuType) {
+        QlyLogger.debug("Popping up menu: \(type.rawValue)", log: .menu)
         let menu: NSMenu?
         switch type {
         case .main:
@@ -82,7 +83,7 @@ extension MenuManager {
         // Snippets
         var index = firstIndexOfMenuItems()
         folder.snippets
-            .sorted(byKeyPath: #keyPath(CPYSnippet.index), ascending: true)
+            .sorted(by: { $0.index < $1.index })
             .filter { $0.enable }
             .forEach { snippet in
                 let subMenuItem = makeSnippetMenuItem(snippet, listNumber: index)
@@ -96,79 +97,49 @@ extension MenuManager {
 // MARK: - Binding
 private extension MenuManager {
     func bind() {
-        // Realm Notification
-        clipToken = realm.objects(CPYClip.self)
-                        .observe { [weak self] _ in
-                            DispatchQueue.main.async { [weak self] in
-                                self?.createClipMenu()
-                            }
-                        }
-        snippetToken = realm.objects(CPYFolder.self)
-                        .observe { [weak self] _ in
-                            DispatchQueue.main.async { [weak self] in
-                                self?.createClipMenu()
-                            }
-                        }
+        cancellables = []
+        // DataService Notification
+        notificationCenter.publisher(for: .clipsUpdated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.createClipMenu()
+            }
+            .store(in: &cancellables)
+
+        notificationCenter.publisher(for: .snippetsUpdated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.createClipMenu()
+            }
+            .store(in: &cancellables)
+
         // Menu icon
-        AppEnvironment.current.defaults.rx.observe(Int.self, Constants.UserDefaults.showStatusItem, retainSelf: false)
+        AppEnvironment.current.defaults.qly_observe(Int.self, Constants.UserDefaults.showStatusItem)
             .compactMap { $0 }
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { [weak self] key in
-                self?.changeStatusItem(StatusType(rawValue: key) ?? .black)
-            })
-            .disposed(by: disposeBag)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] (key: Int) in
+                self?.changeStatusItem(StatusType(rawValue: key) ?? .clipboard)
+            }
+            .store(in: &cancellables)
+
         // Sort clips
-        AppEnvironment.current.defaults.rx.observe(Bool.self, Constants.UserDefaults.reorderClipsAfterPasting, options: [.new], retainSelf: false)
+        AppEnvironment.current.defaults.qly_observe(Bool.self, Constants.UserDefaults.reorderClipsAfterPasting)
             .compactMap { $0 }
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { [weak self] _ in
-                guard let wSelf = self else { return }
-                wSelf.createClipMenu()
-            })
-            .disposed(by: disposeBag)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] (_: Bool) in
+                self?.createClipMenu()
+            }
+            .store(in: &cancellables)
+
         // Edit snippets
-        notificationCenter.rx.notification(Notification.Name(rawValue: Constants.Notification.closeSnippetEditor))
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { [weak self] _ in
+        notificationCenter.publisher(for: Notification.Name(rawValue: Constants.Notification.closeSnippetEditor))
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] (_: Notification) in
                 self?.createClipMenu()
-            })
-            .disposed(by: disposeBag)
-        // Observe change preference settings
-        let defaults = AppEnvironment.current.defaults
-        var menuChangedObservables = [Observable<Void>]()
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.addClearHistoryMenuItem, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Int.self, Constants.UserDefaults.maxHistorySize, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.showIconInTheMenu, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Int.self, Constants.UserDefaults.numberOfItemsPlaceInline, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Int.self, Constants.UserDefaults.numberOfItemsPlaceInsideFolder, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Int.self, Constants.UserDefaults.maxMenuItemTitleLength, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.menuItemsTitleStartWithZero, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.menuItemsAreMarkedWithNumbers, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.showToolTipOnMenuItem, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.showImageInTheMenu, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.addNumericKeyEquivalents, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Int.self, Constants.UserDefaults.maxLengthOfToolTip, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        menuChangedObservables.append(defaults.rx.observe(Bool.self, Constants.UserDefaults.showColorPreviewInTheMenu, options: [.new], retainSelf: false)
-                                        .compactMap { $0 }.distinctUntilChanged().map { _ in })
-        Observable.merge(menuChangedObservables)
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .asDriver(onErrorDriveWith: .empty())
-            .drive(onNext: { [weak self] in
-                self?.createClipMenu()
-            })
-            .disposed(by: disposeBag)
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -274,10 +245,16 @@ private extension MenuManager {
         var subMenuIndex = 1 + placeInLine
 
         let ascending = !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.reorderClipsAfterPasting)
-        let clipResults = realm.objects(CPYClip.self).sorted(byKeyPath: #keyPath(CPYClip.updateTime), ascending: ascending)
-        let currentSize = Int(clipResults.count)
+        let clips = AppEnvironment.current.dataService.clips.sorted(by: { 
+            if ascending {
+                return $0.updateTime < $1.updateTime
+            } else {
+                return $0.updateTime > $1.updateTime
+            }
+        })
+        let currentSize = clips.count
         var i = 0
-        for clip in clipResults {
+        for clip in clips {
             if placeInLine < 1 || placeInLine - 1 < i {
                 // Folder
                 if i == subMenuCount {
@@ -351,17 +328,13 @@ private extension MenuManager {
         }
 
         if !clip.thumbnailPath.isEmpty && !clip.isColorCode && isShowImage {
-            PINCache.shared.object(forKeyAsync: clip.thumbnailPath) { [weak menuItem] _, _, object in
-                DispatchQueue.main.async {
-                    menuItem?.image = object as? NSImage
-                }
+            ImageCacheService.shared.image(forKey: clip.thumbnailPath) { [weak menuItem] _, image in
+                menuItem?.image = image
             }
         }
         if !clip.thumbnailPath.isEmpty && clip.isColorCode && isShowColorCode {
-            PINCache.shared.object(forKeyAsync: clip.thumbnailPath) { [weak menuItem] _, _, object in
-                DispatchQueue.main.async {
-                    menuItem?.image = object as? NSImage
-                }
+            ImageCacheService.shared.image(forKey: clip.thumbnailPath) { [weak menuItem] _, image in
+                menuItem?.image = image
             }
         }
 
@@ -372,8 +345,8 @@ private extension MenuManager {
 // MARK: - Snippets
 private extension MenuManager {
     func addSnippetItems(_ menu: NSMenu, separateMenu: Bool) {
-        let folderResults = realm.objects(CPYFolder.self).sorted(byKeyPath: #keyPath(CPYFolder.index), ascending: true)
-        guard !folderResults.isEmpty else { return }
+        let folders = AppEnvironment.current.dataService.folders.sorted(by: { $0.index < $1.index })
+        guard !folders.isEmpty else { return }
         if separateMenu {
             menu.addItem(NSMenuItem.separator())
         }
@@ -386,7 +359,7 @@ private extension MenuManager {
         var subMenuIndex = menu.numberOfItems - 1
         let firstIndex = firstIndexOfMenuItems()
 
-        folderResults
+        folders
             .filter { $0.enable }
             .forEach { folder in
                 let folderTitle = folder.title
@@ -396,7 +369,7 @@ private extension MenuManager {
 
                 var i = firstIndex
                 folder.snippets
-                    .sorted(byKeyPath: #keyPath(CPYSnippet.index), ascending: true)
+                    .sorted(by: { $0.index < $1.index })
                     .filter { $0.enable }
                     .forEach { snippet in
                         let subMenuItem = makeSnippetMenuItem(snippet, listNumber: i)
@@ -427,23 +400,28 @@ private extension MenuManager {
 // MARK: - Status Item
 private extension MenuManager {
     func changeStatusItem(_ type: StatusType) {
+        if type == currentStatusType { return }
+        currentStatusType = type
+        
         removeStatusItem()
         if type == .none { return }
 
         let image: NSImage?
         switch type {
-        case .black:
+        case .clipboard:
             image = Asset.statusbarMenuBlack.image
-        case .white:
+        case .arrow:
             image = Asset.statusbarMenuWhite.image
+        case .copy:
+            image = Asset.statusbarMenuCopy.image
         case .none: return
         }
         image?.isTemplate = true
+        image?.size = NSSize(width: 18, height: 18)
 
-        statusItem = NSStatusBar.system.statusItem(withLength: -1)
-        statusItem?.image = image
-        statusItem?.highlightMode = true
-        statusItem?.toolTip = "\(Constants.Application.name)\(Bundle.main.appVersion ?? "")"
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem?.button?.image = image
+        statusItem?.button?.toolTip = "\(Constants.Application.name)\(Bundle.main.appVersion ?? "")"
         statusItem?.menu = clipMenu
     }
 
@@ -452,6 +430,7 @@ private extension MenuManager {
             NSStatusBar.system.removeStatusItem(item)
             statusItem = nil
         }
+        currentStatusType = nil
     }
 }
 

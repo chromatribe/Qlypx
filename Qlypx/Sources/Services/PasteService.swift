@@ -1,16 +1,3 @@
-//
-//  PasteService.swift
-//
-//  Qlypx
-//  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
-//
-//  Created by Econa77 on 2016/11/23.
-//
-//  Copyright © 2015-2018 Qlypx Project.
-//
-
-import Foundation
 import Cocoa
 import Sauce
 
@@ -18,72 +5,58 @@ final class PasteService {
 
     // MARK: - Properties
     fileprivate let lock = NSRecursiveLock(name: "com.qlypx.app.Pastable")
-    fileprivate var isPastePlainText: Bool {
-        guard AppEnvironment.current.defaults.bool(forKey: Constants.Beta.pastePlainText) else { return false }
-
-        let modifierSetting = AppEnvironment.current.defaults.integer(forKey: Constants.Beta.pastePlainTextModifier)
-        return isPressedModifier(modifierSetting)
-    }
-    fileprivate var isDeleteHistory: Bool {
-        guard AppEnvironment.current.defaults.bool(forKey: Constants.Beta.deleteHistory) else { return false }
-
-        let modifierSetting = AppEnvironment.current.defaults.integer(forKey: Constants.Beta.deleteHistoryModifier)
-        return isPressedModifier(modifierSetting)
-    }
-    fileprivate var isPasteAndDeleteHistory: Bool {
-        guard AppEnvironment.current.defaults.bool(forKey: Constants.Beta.pasteAndDeleteHistory) else { return false }
-
-        let modifierSetting = AppEnvironment.current.defaults.integer(forKey: Constants.Beta.pasteAndDeleteHistoryModifier)
-        return isPressedModifier(modifierSetting)
-    }
-
-    // MARK: - Modifiers
-    private func isPressedModifier(_ flag: Int) -> Bool {
-        let flags = NSEvent.modifierFlags
-        if flag == 0 && flags.contains(.command) {
-            return true
-        } else if flag == 1 && flags.contains(.shift) {
-            return true
-        } else if flag == 2 && flags.contains(.control) {
-            return true
-        } else if flag == 3 && flags.contains(.option) {
-            return true
-        }
-        return false
-    }
 }
 
 // MARK: - Copy
 extension PasteService {
-    func paste(with clip: CPYClip) {
-        guard !clip.isInvalidated else { return }
-        guard let data = NSKeyedUnarchiver.unarchiveObject(withFile: clip.dataPath) as? CPYClipData else { return }
+    func copyToPasteboard(with clip: CPYClip) {
+        lock.lock(); defer { lock.unlock() }
 
-        // Handling modifier actions
-        let isPastePlainText = self.isPastePlainText
-        let isPasteAndDeleteHistory = self.isPasteAndDeleteHistory
-        let isDeleteHistory = self.isDeleteHistory
-        guard isPastePlainText || isPasteAndDeleteHistory || isDeleteHistory else {
-            copyToPasteboard(with: clip)
-            paste()
+        let data: CPYClipData
+        do {
+            let fileData = try Data(contentsOf: URL(fileURLWithPath: clip.dataPath))
+            let unarchiver = try NSKeyedUnarchiver(forReadingFrom: fileData)
+            unarchiver.requiresSecureCoding = false
+            guard let decodedData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? CPYClipData else { return }
+            data = decodedData
+        } catch {
+            QlyLogger.error("Failed to unarchive clip data for copy from \(clip.dataPath): \(error)", log: .clip)
             return
         }
 
-        // Increment change count for don't copy paste item
-        if isPasteAndDeleteHistory {
-            AppEnvironment.current.clipService.incrementChangeCount()
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+
+        // 1. If we have an image, use writeObjects for the best compatibility
+        if let image = data.image {
+            pasteboard.writeObjects([image])
         }
-        // Paste history
-        if isPastePlainText {
-            copyToPasteboard(with: data.stringValue)
-            paste()
-        } else if isPasteAndDeleteHistory {
-            copyToPasteboard(with: clip)
-            paste()
-        }
-        // Delete clip
-        if isDeleteHistory || isPasteAndDeleteHistory {
-            AppEnvironment.current.clipService.delete(with: clip)
+
+        // 2. Set other types as well
+        let types = data.types
+        types.forEach { type in
+            switch type {
+            case .deprecatedString:
+                pasteboard.setString(data.stringValue, forType: .deprecatedString)
+            case .deprecatedRTFD:
+                if let rtfData = data.RTFData {
+                    pasteboard.setData(rtfData, forType: .deprecatedRTFD)
+                }
+            case .deprecatedRTF:
+                if let rtfData = data.RTFData {
+                    pasteboard.setData(rtfData, forType: .deprecatedRTF)
+                }
+            case .deprecatedPDF:
+                if let pdfData = data.PDF, let pdfRep = NSPDFImageRep(data: pdfData) {
+                    pasteboard.setData(pdfRep.pdfRepresentation, forType: .deprecatedPDF)
+                }
+            case .deprecatedFilenames:
+                pasteboard.setPropertyList(data.fileNames, forType: .deprecatedFilenames)
+            case .deprecatedURL:
+                pasteboard.setPropertyList(data.URLs, forType: .deprecatedURL)
+            default:
+                break
+            }
         }
     }
 
@@ -95,45 +68,9 @@ extension PasteService {
         pasteboard.setString(string, forType: .deprecatedString)
     }
 
-    func copyToPasteboard(with clip: CPYClip) {
-        lock.lock(); defer { lock.unlock() }
-
-        guard let data = NSKeyedUnarchiver.unarchiveObject(withFile: clip.dataPath) as? CPYClipData else { return }
-
-        if isPastePlainText {
-            copyToPasteboard(with: data.stringValue)
-            return
-        }
-
-        let pasteboard = NSPasteboard.general
-        let types = data.types
-        pasteboard.declareTypes(types, owner: nil)
-        types.forEach { type in
-            switch type {
-            case .deprecatedString:
-                let pbString = data.stringValue
-                pasteboard.setString(pbString, forType: .deprecatedString)
-            case .deprecatedRTFD:
-                guard let rtfData = data.RTFData else { return }
-                pasteboard.setData(rtfData, forType: .deprecatedRTFD)
-            case .deprecatedRTF:
-                guard let rtfData = data.RTFData else { return }
-                pasteboard.setData(rtfData, forType: .deprecatedRTF)
-            case .deprecatedPDF:
-                guard let pdfData = data.PDF, let pdfRep = NSPDFImageRep(data: pdfData) else { return }
-                pasteboard.setData(pdfRep.pdfRepresentation, forType: .deprecatedPDF)
-            case .deprecatedFilenames:
-                let fileNames = data.fileNames
-                pasteboard.setPropertyList(fileNames, forType: .deprecatedFilenames)
-            case .deprecatedURL:
-                let url = data.URLs
-                pasteboard.setPropertyList(url, forType: .deprecatedURL)
-            case .deprecatedTIFF:
-                guard let image = data.image, let imageData = image.tiffRepresentation else { return }
-                pasteboard.setData(imageData, forType: .deprecatedTIFF)
-            default: break
-            }
-        }
+    func paste(with clip: CPYClip) {
+        copyToPasteboard(with: clip)
+        paste()
     }
 }
 

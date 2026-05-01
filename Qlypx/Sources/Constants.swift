@@ -20,7 +20,6 @@ struct Constants {
         #else
             static let name = "Qlypx"
         #endif
-        static let appcastURL = URL(string: "https://qlypx-app.com/appcast.xml")!
     }
 
     struct Menu {
@@ -70,15 +69,6 @@ struct Constants {
         static let showColorPreviewInTheMenu = "kCPYPrefShowColorPreviewInTheMenu"
     }
 
-    struct Beta {
-        static let pastePlainText = "kCPYBetaPastePlainText"
-        static let pastePlainTextModifier = "kCPYBetaPastePlainTextModifier"
-        static let deleteHistory = "kCPYBetaDeleteHistory"
-        static let deleteHistoryModifier = "kCPYBetaDeleteHistoryModifier"
-        static let pasteAndDeleteHistory = "kCPYBetaPasteAndDeleteHistory"
-        static let pasteAndDeleteHistoryModifier = "kCPYBetapasteAndDeleteHistoryModifier"
-        static let observerScreenshot = "kCPYBetaObserveScreenshot"
-    }
 
     struct Update {
         static let enableAutomaticCheck = "kCPYEnableAutomaticCheckKey"

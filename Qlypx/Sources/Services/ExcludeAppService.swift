@@ -11,15 +11,14 @@
 //
 
 import AppKit
-import RxSwift
-import RxCocoa
+import Combine
 
 final class ExcludeAppService {
 
     // MARK: - Properties
     fileprivate(set) var applications = [CPYAppInfo]()
-    fileprivate var frontApplication = BehaviorRelay<NSRunningApplication?>(value: nil)
-    fileprivate var disposeBag = DisposeBag()
+    fileprivate var frontApplication = CurrentValueSubject<NSRunningApplication?, Never>(nil)
+    fileprivate var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialize
     init(applications: [CPYAppInfo]) {
@@ -31,12 +30,14 @@ final class ExcludeAppService {
 // MARK: - Monitor Applications
 extension ExcludeAppService {
     func startMonitoring() {
-        disposeBag = DisposeBag()
+        cancellables = []
         // Monitoring top active application
-        NSWorkspace.shared.notificationCenter.rx.notification(NSWorkspace.didActivateApplicationNotification)
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification, object: nil)
             .map { $0.userInfo?["NSWorkspaceApplicationKey"] as? NSRunningApplication }
-            .bind(to: frontApplication)
-            .disposed(by: disposeBag)
+            .sink { [weak self] app in
+                self?.frontApplication.send(app)
+            }
+            .store(in: &cancellables)
     }
 }
 

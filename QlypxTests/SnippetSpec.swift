@@ -1,21 +1,34 @@
 import Quick
 import Nimble
-import RealmSwift
 @testable import Qlypx
 
 class SnippetSpec: QuickSpec {
     override func spec() {
+        var dataService: DataService!
+        var testStoragePath: String!
 
         beforeEach {
-            Realm.Configuration.defaultConfiguration.inMemoryIdentifier = NSUUID().uuidString
+            testStoragePath = (NSTemporaryDirectory() as NSString).appendingPathComponent(UUID().uuidString)
+            try? FileManager.default.createDirectory(atPath: testStoragePath, withIntermediateDirectories: true, attributes: nil)
+            dataService = DataService(storageDirectory: testStoragePath)
+            AppEnvironment.push(dataService: dataService)
         }
 
-        describe("Sync database") {
+        afterEach {
+            AppEnvironment.popLast()
+            try? FileManager.default.removeItem(atPath: testStoragePath)
+        }
+
+        describe("Snippet actions") {
 
             it("Merge snippet") {
+                let folder = CPYFolder()
+                dataService.upsertFolder(folder)
+
                 let snippet = CPYSnippet()
-                let realm = try! Realm()
-                realm.transaction { realm.add(snippet) }
+                snippet.title = "untitled"
+                folder.snippets.append(snippet)
+                dataService.upsertFolder(folder)
 
                 let snippet2 = CPYSnippet()
                 snippet2.identifier = snippet.identifier
@@ -23,32 +36,28 @@ class SnippetSpec: QuickSpec {
                 snippet2.title = "title"
                 snippet2.content = "content"
                 snippet2.merge()
-                expect(snippet2.realm).to(beNil())
 
-                expect(snippet.index) == snippet2.index
-                expect(snippet.title) == snippet2.title
-                expect(snippet.content) == snippet2.content
+                let savedFolder = dataService.folders.first!
+                let savedSnippet = savedFolder.snippets.first!
+                
+                expect(savedSnippet.index) == snippet2.index
+                expect(savedSnippet.title) == snippet2.title
+                expect(savedSnippet.content) == snippet2.content
             }
 
             it("Remove snippet") {
-                let realm = try! Realm()
-                expect(realm.objects(CPYSnippet.self).count) == 0
-
+                let folder = CPYFolder()
                 let snippet = CPYSnippet()
-                realm.transaction { realm.add(snippet) }
+                folder.snippets.append(snippet)
+                dataService.upsertFolder(folder)
 
-                expect(realm.objects(CPYSnippet.self).count) == 1
+                expect(dataService.folders.first?.snippets.count) == 1
 
                 let snippet2 = CPYSnippet()
                 snippet2.identifier = snippet.identifier
                 snippet2.remove()
 
-                expect(realm.objects(CPYSnippet.self).count) == 0
-            }
-
-            afterEach {
-                let realm = try! Realm()
-                realm.transaction { realm.deleteAll() }
+                expect(dataService.folders.first?.snippets.count) == 0
             }
 
         }

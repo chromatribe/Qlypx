@@ -12,7 +12,8 @@
 
 import Cocoa
 
-final class CPYAppInfo: NSObject, NSCoding {
+final class CPYAppInfo: NSObject, NSSecureCoding {
+    static var supportsSecureCoding: Bool { return true }
 
     // MARK: - Properties
     let identifier: String

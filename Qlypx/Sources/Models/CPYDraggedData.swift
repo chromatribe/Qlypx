@@ -12,7 +12,8 @@
 
 import Foundation
 
-final class CPYDraggedData: NSObject, NSCoding {
+final class CPYDraggedData: NSObject, NSSecureCoding {
+    static var supportsSecureCoding: Bool { return true }
 
     // MARK: - Properties
     let type: DragType

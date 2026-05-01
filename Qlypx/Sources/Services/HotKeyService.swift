@@ -13,7 +13,6 @@
 import Foundation
 import Cocoa
 import Magnet
-import RealmSwift
 
 final class HotKeyService: NSObject {
 
@@ -77,6 +76,7 @@ extension HotKeyService {
     }
 
     func change(with type: MenuType, keyCombo: KeyCombo?) {
+        QlyLogger.debug("Changing HotKey for \(type.rawValue) to \(String(describing: keyCombo))", log: .hotkey)
         switch type {
         case .main:
             mainKeyCombo = keyCombo
@@ -89,9 +89,18 @@ extension HotKeyService {
     }
 
     func changeClearHistoryKeyCombo(_ keyCombo: KeyCombo?) {
+        QlyLogger.debug("Changing ClearHistory HotKey to \(String(describing: keyCombo))", log: .hotkey)
         clearHistoryKeyCombo = keyCombo
-        AppEnvironment.current.defaults.set(keyCombo?.archive(), forKey: Constants.HotKey.clearHistoryKeyCombo)
-        AppEnvironment.current.defaults.synchronize()
+        if let keyCombo = keyCombo {
+            do {
+                let data = try NSKeyedArchiver.archivedData(withRootObject: keyCombo, requiringSecureCoding: false)
+                AppEnvironment.current.defaults.set(data, forKey: Constants.HotKey.clearHistoryKeyCombo)
+            } catch {
+                QlyLogger.error("Failed to archive ClearHistory KeyCombo: \(error)", log: .hotkey)
+            }
+        } else {
+            AppEnvironment.current.defaults.removeObject(forKey: Constants.HotKey.clearHistoryKeyCombo)
+        }
         // Reset hotkey
         HotKeyCenter.shared.unregisterHotKey(with: "ClearHistory")
         // Register new hotkey
@@ -102,8 +111,15 @@ extension HotKeyService {
 
     private func savedKeyCombo(forKey key: String) -> KeyCombo? {
         guard let data = AppEnvironment.current.defaults.object(forKey: key) as? Data else { return nil }
-        guard let keyCombo = NSKeyedUnarchiver.unarchiveObject(with: data) as? KeyCombo else { return nil }
-        return keyCombo
+        do {
+            let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
+            unarchiver.requiresSecureCoding = false
+            let keyCombo = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? KeyCombo
+            return keyCombo
+        } catch {
+            QlyLogger.error("Failed to unarchive KeyCombo for key \(key): \(error)", log: .hotkey)
+            return nil
+        }
     }
 }
 
@@ -112,16 +128,33 @@ private extension HotKeyService {
     func register(with type: MenuType, keyCombo: KeyCombo?) {
         save(with: type, keyCombo: keyCombo)
         // Reset hotkey
+        QlyLogger.debug("Unregistering HotKey for \(type.rawValue)", log: .hotkey)
         HotKeyCenter.shared.unregisterHotKey(with: type.rawValue)
         // Register new hotkey
-        guard let keyCombo = keyCombo else { return }
+        guard let keyCombo = keyCombo else { 
+            QlyLogger.debug("No KeyCombo for \(type.rawValue), skipping registration", log: .hotkey)
+            return 
+        }
+        QlyLogger.debug("Registering HotKey for \(type.rawValue): \(keyCombo)", log: .hotkey)
         let hotKey = HotKey(identifier: type.rawValue, keyCombo: keyCombo, target: self, action: type.hotKeySelector)
-        hotKey.register()
+        if hotKey.register() {
+            QlyLogger.debug("Successfully registered HotKey for \(type.rawValue)", log: .hotkey)
+        } else {
+            QlyLogger.error("Failed to register HotKey for \(type.rawValue)", log: .hotkey)
+        }
     }
 
     func save(with type: MenuType, keyCombo: KeyCombo?) {
-        AppEnvironment.current.defaults.set(keyCombo?.archive(), forKey: type.userDefaultsKey)
-        AppEnvironment.current.defaults.synchronize()
+        if let keyCombo = keyCombo {
+            do {
+                let data = try NSKeyedArchiver.archivedData(withRootObject: keyCombo, requiringSecureCoding: false)
+                AppEnvironment.current.defaults.set(data, forKey: type.userDefaultsKey)
+            } catch {
+                QlyLogger.error("Failed to archive KeyCombo for \(type.rawValue): \(error)", log: .hotkey)
+            }
+        } else {
+            AppEnvironment.current.defaults.removeObject(forKey: type.userDefaultsKey)
+        }
     }
 }
 
@@ -137,19 +170,19 @@ private extension HotKeyService {
         // Main menu
         if let (keyCode, modifiers) = parse(with: keyCombos, forKey: Constants.Menu.clip) {
             if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
-                AppEnvironment.current.defaults.set(keyCombo.archive(), forKey: Constants.HotKey.mainKeyCombo)
+                save(with: .main, keyCombo: keyCombo)
             }
         }
         // History menu
         if let (keyCode, modifiers) = parse(with: keyCombos, forKey: Constants.Menu.history) {
             if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
-                AppEnvironment.current.defaults.set(keyCombo.archive(), forKey: Constants.HotKey.historyKeyCombo)
+                save(with: .history, keyCombo: keyCombo)
             }
         }
         // Snippet menu
         if let (keyCode, modifiers) = parse(with: keyCombos, forKey: Constants.Menu.snippet) {
             if let keyCombo = KeyCombo(QWERTYKeyCode: keyCode, carbonModifiers: modifiers) {
-                AppEnvironment.current.defaults.set(keyCombo.archive(), forKey: Constants.HotKey.snippetKeyCombo)
+                save(with: .snippet, keyCombo: keyCombo)
             }
         }
     }
@@ -166,11 +199,23 @@ extension HotKeyService {
     private var folderKeyCombos: [String: KeyCombo]? {
         get {
             guard let data = AppEnvironment.current.defaults.object(forKey: Constants.HotKey.folderKeyCombos) as? Data else { return nil }
-            return NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: KeyCombo]
+            do {
+                let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
+                unarchiver.requiresSecureCoding = false
+                return unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? [String: KeyCombo]
+            } catch {
+                QlyLogger.error("Failed to unarchive folderKeyCombos: \(error)", log: .hotkey)
+                return nil
+            }
         }
         set {
             if let value = newValue {
-                AppEnvironment.current.defaults.set(NSKeyedArchiver.archivedData(withRootObject: value), forKey: Constants.HotKey.folderKeyCombos)
+                do {
+                    let data = try NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: false)
+                    AppEnvironment.current.defaults.set(data, forKey: Constants.HotKey.folderKeyCombos)
+                } catch {
+                    QlyLogger.error("Failed to archive folderKeyCombos: \(error)", log: .hotkey)
+                }
             } else {
                 AppEnvironment.current.defaults.removeObject(forKey: Constants.HotKey.folderKeyCombos)
             }
@@ -205,8 +250,7 @@ extension HotKeyService {
 
     @objc func popupSnippetFolder(_ object: AnyObject) {
         guard let hotKey = object as? HotKey else { return }
-        let realm = try! Realm()
-        guard let folder = realm.object(ofType: CPYFolder.self, forPrimaryKey: hotKey.identifier) else {
+        guard let folder = AppEnvironment.current.dataService.folders.first(where: { $0.identifier == hotKey.identifier }) else {
             // When already deleted folder, remove keycombos
             unregisterSnippetHotKey(with: hotKey.identifier)
             return

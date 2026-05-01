@@ -1,16 +1,5 @@
-//
-//  CPYExcludeAppPreferenceViewController.swift
-//
-//  Qlypx
-//  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
-//
-//  Created by Econa77 on 2016/08/08.
-//
-//  Copyright © 2015-2018 Qlypx Project.
-//
-
 import Cocoa
+import UniformTypeIdentifiers
 
 class CPYExcludeAppPreferenceViewController: NSViewController {
     // MARK: - Properties
@@ -21,7 +10,11 @@ class CPYExcludeAppPreferenceViewController: NSViewController {
 extension CPYExcludeAppPreferenceViewController {
     @IBAction private func addAppButtonTapped(_ sender: AnyObject) {
         let openPanel = NSOpenPanel()
-        openPanel.allowedFileTypes = ["app"]
+        if #available(macOS 11.0, *) {
+            openPanel.allowedContentTypes = [UTType.application]
+        } else {
+            openPanel.allowedFileTypes = ["app"]
+        }
         openPanel.allowsMultipleSelection = true
         openPanel.resolvesAliases = true
         openPanel.prompt = L10n.add

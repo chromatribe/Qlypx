@@ -15,32 +15,38 @@ import Foundation
 struct Environment {
 
     // MARK: - Properties
+    let dataService: DataService
     let clipService: ClipService
     let hotKeyService: HotKeyService
     let dataCleanService: DataCleanService
     let pasteService: PasteService
     let excludeAppService: ExcludeAppService
     let accessibilityService: AccessibilityService
+    let updateService: UpdateService
     let menuManager: MenuManager
 
     let defaults: UserDefaults
 
     // MARK: - Initialize
-    init(clipService: ClipService = ClipService(),
+    init(dataService: DataService = DataService(),
+         clipService: ClipService = ClipService(),
          hotKeyService: HotKeyService = HotKeyService(),
          dataCleanService: DataCleanService = DataCleanService(),
          pasteService: PasteService = PasteService(),
          excludeAppService: ExcludeAppService = ExcludeAppService(applications: []),
          accessibilityService: AccessibilityService = AccessibilityService(),
+         updateService: UpdateService = UpdateService(),
          menuManager: MenuManager = MenuManager(),
          defaults: UserDefaults = .standard) {
 
+        self.dataService = dataService
         self.clipService = clipService
         self.hotKeyService = hotKeyService
         self.dataCleanService = dataCleanService
         self.pasteService = pasteService
         self.excludeAppService = excludeAppService
         self.accessibilityService = accessibilityService
+        self.updateService = updateService
         self.menuManager = menuManager
         self.defaults = defaults
     }

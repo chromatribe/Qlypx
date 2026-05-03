@@ -64,6 +64,86 @@ Qlypx は、単なる Clipy のクローンではありません。**「Apple Si
 6. **ユーザー向け説明**: 自然な日本語で行う。
 7. **新ファイル追加時**: Xcode の `.xcodeproj` に登録されているファイルのみコンパイル対象になる。新規 `.swift` を追加しても Xcode 上で「Add to Target」しなければビルドエラーになる。既存ファイルへの統合を優先する。
 
+### ⚠️ このプロジェクト固有のよくあるエラーと対処法
+
+実際に踏んだ地雷を記録。同じ失敗を繰り返さないこと。
+
+#### 1. `NSPasteboard.PasteboardType` 拡張で OS 標準と同名のプロパティを再定義してはいけない
+
+```swift
+// ❌ NG: OS標準の .string を extension 内で再定義すると、同じ extension 内の
+//        カスタム定数（.legacyString 等）が「not found in scope」になる
+extension NSPasteboard.PasteboardType {
+    static let string = NSPasteboard.PasteboardType.string  // 循環・重複
+    static let legacyString = ...  // ← コンパイラがこれを見失う
+}
+
+// ✅ OK: カスタム定数のみ定義。OS 標準（.string / .pdf 等）は再定義しない
+extension NSPasteboard.PasteboardType {
+    static let legacyString = NSPasteboard.PasteboardType(rawValue: "NSStringPboardType")
+}
+
+// ✅ OK: switch 文や引数では完全修飾名で曖昧さを消す
+case NSPasteboard.PasteboardType.legacyString:
+```
+
+#### 2. ファイル名の変更は必ず Xcode 上で行う
+
+```bash
+# ❌ NG: terminal の mv コマンドはファイルを動かすだけ。
+#        .xcodeproj/project.pbxproj の参照は古いままになりビルドエラーになる
+mv NSPasteboard+Deprecated.swift NSPasteboard+Modern.swift
+
+# ✅ OK: Xcode のファイルリスト上で直接リネーム（Xcode が .xcodeproj も自動更新）
+```
+
+#### 3. `NSObject` の `hash` オーバーライドは `Hasher` を使う
+
+```swift
+// ❌ NG: URL の .hash は (inout Hasher)->() であり Int ではないので型エラーになる
+override var hash: Int {
+    var h = 0
+    fileURLs.forEach { h ^= $0.hash }  // コンパイルエラー
+    return h
+}
+
+// ✅ OK: Hasher.combine() に渡す
+override var hash: Int {
+    var hasher = Hasher()
+    fileURLs.forEach { hasher.combine($0) }  // URL は Hashable
+    return hasher.finalize()
+}
+```
+
+#### 4. `Environment` / `AppEnvironment` に新サービスを追加するときは 4 箇所同時更新
+
+1 ファイルでも漏れると `Cannot find type 'XxxService' in scope` が多発する。
+
+| ファイル | 更新内容 |
+|---|---|
+| `Environment.swift` | プロパティ宣言 + `init` の引数と代入 |
+| `AppEnvironment.swift` - `push()` | 引数追加 + `Environment(...)` 呼び出しに追記 |
+| `AppEnvironment.swift` - `replaceCurrent()` | 同上 |
+| `AppEnvironment.swift` - `fromStorage()` | `return Environment(...)` の末尾に引数追記 |
+
+#### 5. `NSPasteboard.PasteboardType(rawValue:)` は非オプショナル
+
+```swift
+let type = NSPasteboard.PasteboardType(rawValue: clip.primaryType)
+// type の型は NSPasteboard.PasteboardType（Optional ではない）
+
+// ❌ NG: optional chaining は使えない
+if type?.isImage == true { ... }
+
+// ✅ OK
+if type.isImage { ... }
+```
+
+#### 6. SwiftGen は環境によって実行できない場合がある
+
+`LocalizedStrings.swift` に新しい L10n キーを追加するときは `swiftgen` コマンドを試みること。
+実行環境がない場合は手動で `LocalizedStrings.swift` に静的プロパティを追記する（構造を崩さないよう末尾に追加）。
+
 ---
 
 ## 3. ファイル辞書（責務の一覧）

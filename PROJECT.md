@@ -3,7 +3,7 @@
 > **このファイルがプロジェクトの唯一の真実（Single Source of Truth）です。**
 > `GEMINI.md` はこのファイルへの入口として短く保ちます。
 
-**Current Version:** `1.20260503.1`
+**Current Version:** `1.20260503.2`
 
 ---
 
@@ -260,6 +260,12 @@ if type.isImage { ... }
 ---
 
 ## 5. Change Log
+
+### 1.20260503.2
+- **Refactor**: 設定画面を大幅に整理。迷わせないミニマリズム構成へ移行。
+- **Feature**: 重複コピー時に「上書きして先頭に移動」する挙動を標準化。
+- **UI**: 設定パネルから冗長な項目（Cmd+V自動入力、数字キーショートカット、0開始設定等）を削除し、レイアウトを最適化。
+- **Logic**: `DataService` と `ClipService` の重複処理ロジックを統合・簡略化。
 
 ### 1.20260503.1
 - **Modernization**: クリップボード処理を `deprecated` 定数から最新 API に刷新。PDF/FileURL の互換性向上。

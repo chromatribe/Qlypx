@@ -29,7 +29,7 @@ struct Environment {
     let defaults: UserDefaults
 
     // MARK: - Initialize
-    init(dataService: DataService = DataService(),
+    init(dataService: DataService? = nil,
          clipService: ClipService = ClipService(),
          hotKeyService: HotKeyService = HotKeyService(),
          dataCleanService: DataCleanService = DataCleanService(),
@@ -41,7 +41,8 @@ struct Environment {
          menuManager: MenuManager = MenuManager(),
          defaults: UserDefaults = .standard) {
 
-        self.dataService = dataService
+        self.defaults = defaults
+        self.dataService = dataService ?? DataService(defaults: defaults)
         self.clipService = clipService
         self.hotKeyService = hotKeyService
         self.dataCleanService = dataCleanService
@@ -51,7 +52,6 @@ struct Environment {
         self.updateService = updateService
         self.diagnosticService = diagnosticService
         self.menuManager = menuManager
-        self.defaults = defaults
     }
 
 }

@@ -140,6 +140,27 @@ private extension MenuManager {
                 self?.createClipMenu()
             }
             .store(in: &cancellables)
+
+        // Various menu settings
+        [Constants.UserDefaults.maxHistorySize,
+         Constants.UserDefaults.numberOfItemsPlaceInline,
+         Constants.UserDefaults.numberOfItemsPlaceInsideFolder,
+         Constants.UserDefaults.maxMenuItemTitleLength,
+         Constants.UserDefaults.menuItemsTitleStartWithZero,
+         Constants.UserDefaults.menuItemsAreMarkedWithNumbers,
+         Constants.UserDefaults.showToolTipOnMenuItem,
+         Constants.UserDefaults.showImageInTheMenu,
+         Constants.UserDefaults.showColorPreviewInTheMenu,
+         Constants.UserDefaults.addNumericKeyEquivalents,
+         Constants.UserDefaults.maxLengthOfToolTip,
+         Constants.UserDefaults.showIconInTheMenu].forEach { key in
+            AppEnvironment.current.defaults.qly_observe(Any.self, key)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    self?.createClipMenu()
+                }
+                .store(in: &cancellables)
+        }
     }
 }
 

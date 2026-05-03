@@ -1,4 +1,5 @@
 import Cocoa
+import Combine
 
 extension Notification.Name {
     static let clipsUpdated = Notification.Name("com.qlypx.app.DataService.clipsUpdated")
@@ -10,6 +11,8 @@ final class DataService {
     // MARK: - Properties
     private let clipsQueue = DispatchQueue(label: "com.qlypx.app.DataService.clips", qos: .background)
     private let snippetsQueue = DispatchQueue(label: "com.qlypx.app.DataService.snippets", qos: .background)
+    private var cancellables = Set<AnyCancellable>()
+    private let defaults: UserDefaults
 
     private(set) var clips: [CPYClip] = []
     private(set) var folders: [CPYFolder] = []
@@ -25,9 +28,20 @@ final class DataService {
     }
 
     // MARK: - Initialize
-    init(storageDirectory: String = CPYUtilities.applicationSupportFolder()) {
+    init(defaults: UserDefaults = .standard, storageDirectory: String = CPYUtilities.applicationSupportFolder()) {
+        self.defaults = defaults
         self.storageDirectory = storageDirectory
         loadData()
+        bind()
+    }
+
+    private func bind() {
+        defaults.qly_observe(Int.self, Constants.UserDefaults.maxHistorySize)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.trimHistory()
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Load & Save
@@ -76,8 +90,12 @@ final class DataService {
             clips.remove(at: index)
         }
         clips.insert(clip, at: 0)
+        trimHistory()
+    }
+
+    func trimHistory() {
         // Limit history size
-        let maxSize = AppEnvironment.current.defaults.integer(forKey: Constants.UserDefaults.maxHistorySize)
+        let maxSize = defaults.integer(forKey: Constants.UserDefaults.maxHistorySize)
         if clips.count > maxSize {
             let clipsToRemove = clips.suffix(from: maxSize)
             clipsToRemove.forEach { clipToRemove in

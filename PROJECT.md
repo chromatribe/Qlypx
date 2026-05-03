@@ -3,7 +3,7 @@
 > **このファイルがプロジェクトの唯一の真実（Single Source of Truth）です。**
 > `GEMINI.md` はこのファイルへの入口として短く保ちます。
 
-**Current Version:** `1.20260503.11`
+**Current Version:** `1.20260503.12`
 
 ---
 
@@ -265,8 +265,10 @@ if type.isImage { ... }
 
 ## 5. Change Log
 
-### 1.20260503.11
-- **Chore**: バージョン同期（Info.plist / PROJECT.md）とチェンジログの並び順修正。
+### 1.20260503.12
+- **Fix**: 設定項目（履歴数、表示数、文字数等）の変更が即座にメニュー挙動へ反映されない問題を解消。
+- **Fix**: アプリ起動時に `DataService` と `AppEnvironment` の間で発生していた再帰的初期化（デッドロック）を修正。
+- **Fix**: `DataService.swift` での `Combine` インポート不足によるコンパイルエラーを修正。
 
 ### 1.20260503.10
 - **Fix**: SwiftUI の描画サイクル中に状態を更新することで発生していた `Publishing changes from within view updates` 警告を完全に解消。

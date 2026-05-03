@@ -22,15 +22,15 @@ class SnippetSpec: QuickSpec {
         describe("Snippet actions") {
 
             it("Merge snippet") {
-                let folder = CPYFolder()
+                let folder = QLYFolder()
                 dataService.upsertFolder(folder)
 
-                let snippet = CPYSnippet()
+                let snippet = QLYSnippet()
                 snippet.title = "untitled"
                 folder.snippets.append(snippet)
                 dataService.upsertFolder(folder)
 
-                let snippet2 = CPYSnippet()
+                let snippet2 = QLYSnippet()
                 snippet2.identifier = snippet.identifier
                 snippet2.index = 100
                 snippet2.title = "title"
@@ -46,14 +46,14 @@ class SnippetSpec: QuickSpec {
             }
 
             it("Remove snippet") {
-                let folder = CPYFolder()
-                let snippet = CPYSnippet()
+                let folder = QLYFolder()
+                let snippet = QLYSnippet()
                 folder.snippets.append(snippet)
                 dataService.upsertFolder(folder)
 
                 expect(dataService.folders.first?.snippets.count) == 1
 
-                let snippet2 = CPYSnippet()
+                let snippet2 = QLYSnippet()
                 snippet2.identifier = snippet.identifier
                 snippet2.remove()
 

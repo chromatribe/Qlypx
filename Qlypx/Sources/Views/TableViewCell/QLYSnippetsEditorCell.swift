@@ -1,5 +1,5 @@
 //
-//  CPYSnippetsEditorCell.swift
+//  QLYSnippetsEditorCell.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -13,7 +13,7 @@
 import Foundation
 import Cocoa
 
-final class CPYSnippetsEditorCell: NSTextFieldCell {
+final class QLYSnippetsEditorCell: NSTextFieldCell {
 
     // MARK: - Properties
     var iconType = IconType.folder
@@ -36,7 +36,7 @@ final class CPYSnippetsEditorCell: NSTextFieldCell {
     }
 
     override func copy(with zone: NSZone?) -> Any {
-        guard let cell = super.copy(with: zone) as? CPYSnippetsEditorCell else { return super.copy(with: zone) }
+        guard let cell = super.copy(with: zone) as? QLYSnippetsEditorCell else { return super.copy(with: zone) }
         cell.iconType = iconType
         return cell
     }

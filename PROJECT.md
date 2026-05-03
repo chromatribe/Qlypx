@@ -3,7 +3,7 @@
 > **このファイルがプロジェクトの唯一の真実（Single Source of Truth）です。**
 > `GEMINI.md` はこのファイルへの入口として短く保ちます。
 
-**Current Version:** `1.20260504.1`
+**Current Version:** `1.20260504.2`
 
 ---
 
@@ -186,12 +186,12 @@ if type.isImage { ... }
 
 | ファイル | 責務 |
 |---|---|
-| `CPYClip.swift` | 履歴1件を表す永続化モデル（Codable）。 |
-| `CPYClipData.swift` | クリップボードの実データ（NSCoding）。型別フィールドを保持し、NSPasteboard との変換を担う。 |
-| `CPYFolder.swift` | スニペットのフォルダモデル（Codable）。CRUD 操作を自身が持つ。 |
-| `CPYSnippet.swift` | スニペット1件のモデル（Codable）。 |
-| `CPYAppInfo.swift` | 除外アプリ情報のモデル（NSCoding）。 |
-| `CPYDraggedData.swift` | スニペットエディタのドラッグ&ドロップ用データ。 |
+| `QLYClip.swift` | 履歴1件を表す永続化モデル（Codable）。 |
+| `QLYClipData.swift` | クリップボードの実データ（NSCoding）。型別フィールドを保持し、NSPasteboard との変換を担う。 |
+| `QLYFolder.swift` | スニペットのフォルダモデル（Codable）。CRUD 操作を自身が持つ。 |
+| `QLYSnippet.swift` | スニペット1件のモデル（Codable）。 |
+| `QLYAppInfo.swift` | 除外アプリ情報のモデル（NSCoding）。 |
+| `QLYDraggedData.swift` | スニペットエディタのドラッグ&ドロップ用データ。 |
 
 ### Managers
 
@@ -203,11 +203,11 @@ if type.isImage { ... }
 
 | ファイル | 責務 |
 |---|---|
-| `CPYPreferencesWindowController.swift` | 設定ウィンドウ（NSToolbar ナビゲーション）。 |
-| `CPYSnippetsEditorWindowController.swift` | スニペットエディタウィンドウ（SwiftUI）。全機能を一つの ViewModel とビュー群に統合。 |
-| `CPYTypePreferenceViewController.swift` | 「保存する種類」設定パネル。 |
-| `CPYExcludeAppPreferenceViewController.swift` | 除外アプリ設定パネル（ドラッグ&ドロップ対応）。 |
-| `CPYShortcutsPreferenceViewController.swift` | ショートカットキー設定パネル（KeyHolder）。 |
+| `QLYPreferencesWindowController.swift` | 設定ウィンドウ（NSToolbar ナビゲーション）。 |
+| `QLYSnippetsEditorWindowController.swift` | スニペットエディタウィンドウ（SwiftUI）。全機能を一つの ViewModel とビュー群に統合。 |
+| `QLYTypePreferenceViewController.swift` | 「保存する種類」設定パネル。 |
+| `QLYExcludeAppPreferenceViewController.swift` | 除外アプリ設定パネル（ドラッグ&ドロップ対応）。 |
+| `QLYShortcutsPreferenceViewController.swift` | ショートカットキー設定パネル（KeyHolder）。 |
 
 ### Extensions
 
@@ -224,7 +224,7 @@ if type.isImage { ... }
 | ファイル | 責務 |
 |---|---|
 | `QlyLogger.swift` | `os_log` ラッパー（debug/info/warn/error）。**SlackNotificationService / DiagnosticService も同ファイルに統合。** |
-| `CPYUtilities.swift` | アプリサポートフォルダのパス取得・SDK 初期化・UserDefaults デフォルト値登録。 |
+| `QLYUtilities.swift` | アプリサポートフォルダのパス取得・SDK 初期化・UserDefaults デフォルト値登録。 |
 | `ScreenShotObserver.swift` | `NSMetadataQuery` によるスクリーンショット生成の監視。 |
 
 ### Generated（自動生成・手動で編集可）
@@ -253,17 +253,21 @@ if type.isImage { ... }
 - **Phase 3 - Clipboard** - deprecated PasteboardType の排除、PDF/FileURL のモダン化
 - **Phase 3 - Diagnostics** - DiagnosticService（クラッシュ検知 + Web API 自動送信）、受信サーバー、**SlackNotificationService（エラー/クラッシュの Slack 即時通知）**
 - **Phase 4 - SwiftUI** - 設定画面、スニペットエディタの完全 SwiftUI 移行完了。
+- **Phase 4 - Optimization** - 重複コピー・上書きの UX 改善、DiagnosticServer のデプロイ完了。
+- **Phase 4 - Modernization** - プレフィックスの `QLY` 統一、メニュー構築の遅延初期化（パフォーマンス改善）完了。
 
 ### 🚧 進行中 / 未着手
 
-- [ ] `CPY` プレフィックスの `QLY` またはプレフィックスなしへのリネーム（優先度：低）
-- [ ] 設定項目のさらなる絞り込み（重複コピー・上書きの UX 改善）
-- [ ] DiagnosticServer のデプロイ（Vercel / 自前サーバー）と Webhook 接続
-- [ ] 履歴増大時のメニュー表示パフォーマンス改善
+- [ ] (なし)
 
 ---
 
 ## 5. Change Log
+### 1.20260504.2
+- **Refactor**: プロジェクト全体のプレフィックスを `QLY` から `QLY` へ刷新（`QLYClip`, `QLYFolder` 等）。
+- **Performance**: メインメニューの構築を遅延初期化（Lazy Loading）に変更。履歴増大時の表示パフォーマンスとコピー操作時の負荷を大幅に改善。
+- **Fix**: 設定画面に `import Combine` を追加し、ビルドエラーを修正。
+- **i18n**: 中国語（簡体字）のローカライズリソースを最新化。
 
 ### 1.20260504.1
 - **i18n**: 日本語ローカライズの文言をモダンなmacOSのスタイルに合わせ微調整（「環境設定」→「設定」など）。
@@ -295,7 +299,7 @@ if type.isImage { ... }
 - **Modernization**: スニペットエディタを完全に SwiftUI 移行。`NavigationSplitView` によるモダンな 2 ペインレイアウトを採用。
 - **Feature**: `SlackNotificationService` を実装。配布版アプリで発生したエラーやクラッシュをリアルタイムで Slack へ通知する仕組みを導入。
 - **UI/UX**: メニュー項目のレイアウトを `attributedTitle` で刷新。画像がある場合でも「番号. [画像] タイトル」の順で綺麗に整列するように改善。
-- **Refactor**: `CPYFolder` および `CPYSnippet` を `Identifiable` / `ObservableObject` 化し、SwiftUI との親和性を向上。
+- **Refactor**: `QLYFolder` および `QLYSnippet` を `Identifiable` / `ObservableObject` 化し、SwiftUI との親和性を向上。
 - **Fix**: ウィンドウホスト時のレイアウト再帰呼び出し警告を修正。
 
 ### 1.20260503.7
@@ -315,7 +319,7 @@ if type.isImage { ... }
 ### 1.20260503.4
 - **UI/UX**: 設定画面の全5タブを完全に SwiftUI へ移行。
 - **Modernization**: ウィンドウのリサイズ対応と最新 API (SMAppService, UTType) への準拠。
-- **Fix**: `CPYAppInfo` のアイコン取得ロジックの修正。
+- **Fix**: `QLYAppInfo` のアイコン取得ロジックの修正。
 
 ### 1.20260503.3
 - **Modernization**: 設定画面（一般・メニュー）の SwiftUI 移行。

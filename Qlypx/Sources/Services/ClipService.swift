@@ -75,7 +75,7 @@ final class ClipService {
         AppEnvironment.current.dataCleanService.cleanDatas()
     }
 
-    func delete(with clip: CPYClip) {
+    func delete(with clip: QLYClip) {
         // Delete saved images
         let path = clip.thumbnailPath
         if !path.isEmpty {
@@ -108,7 +108,7 @@ extension ClipService {
         guard !AppEnvironment.current.excludeAppService.copiedProcessIsExcludedApplications(pasteboard: pasteboard) else { return }
 
         // Create data
-        let data = CPYClipData(pasteboard: pasteboard, types: types)
+        let data = QLYClipData(pasteboard: pasteboard, types: types)
         save(with: data)
     }
 
@@ -116,11 +116,11 @@ extension ClipService {
         lock.lock(); defer { lock.unlock() }
 
         // Create only image data
-        let data = CPYClipData(image: image)
+        let data = QLYClipData(image: image)
         save(with: data)
     }
 
-    fileprivate func save(with data: CPYClipData) {
+    fileprivate func save(with data: QLYClipData) {
         let dataService = AppEnvironment.current.dataService
 
         // Don't save empty string history
@@ -132,9 +132,9 @@ extension ClipService {
         // Saved time and path
         let unixTime = Int(Date().timeIntervalSince1970)
         let filename = "\(NSUUID().uuidString).data"
-        let savedPath = (CPYUtilities.applicationSupportFolder() as NSString).appendingPathComponent(filename)
+        let savedPath = (QLYUtilities.applicationSupportFolder() as NSString).appendingPathComponent(filename)
         
-        let clip = CPYClip()
+        let clip = QLYClip()
         clip.dataPath = filename
         clip.title = data.stringValue[0...10000]
         clip.dataHash = "\(savedHash)"
@@ -153,7 +153,7 @@ extension ClipService {
                 clip.isColorCode = true
             }
             // Save JSON and .data file
-            if CPYUtilities.prepareSaveToPath(CPYUtilities.applicationSupportFolder()) {
+            if QLYUtilities.prepareSaveToPath(QLYUtilities.applicationSupportFolder()) {
                 do {
                     let archivedData = try NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false)
                     try archivedData.write(to: URL(fileURLWithPath: savedPath))
@@ -171,7 +171,7 @@ extension ClipService {
     }
 
     private func canSave(with type: NSPasteboard.PasteboardType) -> Bool {
-        let dictionary = CPYClipData.availableTypesDictinary
+        let dictionary = QLYClipData.availableTypesDictinary
         guard let value = dictionary[type] else { return false }
         guard let number = storeTypes[value] else { return false }
         return number.boolValue

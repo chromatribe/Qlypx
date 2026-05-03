@@ -85,10 +85,10 @@ struct AppEnvironment {
     }
 
     static func fromStorage(defaults: UserDefaults = .standard) -> Environment {
-        var excludeApplications = [CPYAppInfo]()
+        var excludeApplications = [QLYAppInfo]()
         if let data = defaults.object(forKey: Constants.UserDefaults.excludeApplications) as? Data {
             do {
-                if let applications = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSArray.self, CPYAppInfo.self, NSString.self], from: data) as? [CPYAppInfo] {
+                if let applications = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSArray.self, QLYAppInfo.self, NSString.self], from: data) as? [QLYAppInfo] {
                     excludeApplications = applications
                 }
             } catch {

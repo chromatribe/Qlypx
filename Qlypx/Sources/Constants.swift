@@ -38,19 +38,19 @@ struct Constants {
     }
 
     struct UserDefaults {
-        static let hotKeys = "kCPYPrefHotKeysKey"
-        static let menuIconSize = "kCPYPrefMenuIconSizeKey"
-        static let maxHistorySize = "kCPYPrefMaxHistorySizeKey"
-        static let storeTypes = "kCPYPrefStoreTypesKey"
-        static let inputPasteCommand = "kCPYPrefInputPasteCommandKey"
-        static let showIconInTheMenu = "kCPYPrefShowIconInTheMenuKey"
-        static let numberOfItemsPlaceInline = "kCPYPrefNumberOfItemsPlaceInlineKey"
-        static let numberOfItemsPlaceInsideFolder  = "kCPYPrefNumberOfItemsPlaceInsideFolderKey"
-        static let maxMenuItemTitleLength = "kCPYPrefMaxMenuItemTitleLengthKey"
-        static let menuItemsTitleStartWithZero = "kCPYPrefMenuItemsTitleStartWithZeroKey"
-        static let reorderClipsAfterPasting = "kCPYPrefReorderClipsAfterPasting"
-        static let addClearHistoryMenuItem = "kCPYPrefAddClearHistoryMenuItemKey"
-        static let showAlertBeforeClearHistory = "kCPYPrefShowAlertBeforeClearHistoryKey"
+        static let hotKeys = "kQLYPrefHotKeysKey"
+        static let menuIconSize = "kQLYPrefMenuIconSizeKey"
+        static let maxHistorySize = "kQLYPrefMaxHistorySizeKey"
+        static let storeTypes = "kQLYPrefStoreTypesKey"
+        static let inputPasteCommand = "kQLYPrefInputPasteCommandKey"
+        static let showIconInTheMenu = "kQLYPrefShowIconInTheMenuKey"
+        static let numberOfItemsPlaceInline = "kQLYPrefNumberOfItemsPlaceInlineKey"
+        static let numberOfItemsPlaceInsideFolder  = "kQLYPrefNumberOfItemsPlaceInsideFolderKey"
+        static let maxMenuItemTitleLength = "kQLYPrefMaxMenuItemTitleLengthKey"
+        static let menuItemsTitleStartWithZero = "kQLYPrefMenuItemsTitleStartWithZeroKey"
+        static let reorderClipsAfterPasting = "kQLYPrefReorderClipsAfterPasting"
+        static let addClearHistoryMenuItem = "kQLYPrefAddClearHistoryMenuItemKey"
+        static let showAlertBeforeClearHistory = "kQLYPrefShowAlertBeforeClearHistoryKey"
         static let menuItemsAreMarkedWithNumbers = "menuItemsAreMarkedWithNumbers"
         static let showToolTipOnMenuItem = "showToolTipOnMenuItem"
         static let showImageInTheMenu = "showImageInTheMenu"
@@ -58,27 +58,27 @@ struct Constants {
         static let maxLengthOfToolTip = "maxLengthOfToolTipKey"
         static let loginItem = "loginItem"
         static let suppressAlertForLoginItem = "suppressAlertForLoginItem"
-        static let showStatusItem = "kCPYPrefShowStatusItemKey"
+        static let showStatusItem = "kQLYPrefShowStatusItemKey"
         static let thumbnailWidth = "thumbnailWidth"
         static let thumbnailHeight = "thumbnailHeight"
-        static let overwriteSameHistory = "kCPYPrefOverwriteSameHistroy"
-        static let copySameHistory = "kCPYPrefCopySameHistroy"
-        static let suppressAlertForDeleteSnippet = "kCPYSuppressAlertForDeleteSnippet"
-        static let excludeApplications = "kCPYExcludeApplications"
-        static let collectCrashReport = "kCPYCollectCrashReport"
-        static let showColorPreviewInTheMenu = "kCPYPrefShowColorPreviewInTheMenu"
-        static let monitoringSpeed = "kCPYPrefMonitoringSpeedKey"
-        static let language = "kCPYPrefLanguageKey"
+        static let overwriteSameHistory = "kQLYPrefOverwriteSameHistroy"
+        static let copySameHistory = "kQLYPrefCopySameHistroy"
+        static let suppressAlertForDeleteSnippet = "kQLYSuppressAlertForDeleteSnippet"
+        static let excludeApplications = "kQLYExcludeApplications"
+        static let collectCrashReport = "kQLYCollectCrashReport"
+        static let showColorPreviewInTheMenu = "kQLYPrefShowColorPreviewInTheMenu"
+        static let monitoringSpeed = "kQLYPrefMonitoringSpeedKey"
+        static let language = "kQLYPrefLanguageKey"
     }
 
 
     struct Update {
-        static let enableAutomaticCheck = "kCPYEnableAutomaticCheckKey"
-        static let checkInterval = "kCPYUpdateCheckIntervalKey"
+        static let enableAutomaticCheck = "kQLYEnableAutomaticCheckKey"
+        static let checkInterval = "kQLYUpdateCheckIntervalKey"
     }
 
     struct Notification {
-        static let closeSnippetEditor = "kCPYSnippetEditorWillCloseNotification"
+        static let closeSnippetEditor = "kQLYSnippetEditorWillCloseNotification"
     }
 
     struct Xml {
@@ -93,12 +93,12 @@ struct Constants {
     }
 
     struct HotKey {
-        static let mainKeyCombo = "kCPYHotKeyMainKeyCombo"
-        static let historyKeyCombo = "kCPYHotKeyHistoryKeyCombo"
-        static let snippetKeyCombo = "kCPYHotKeySnippetKeyCombo"
-        static let migrateNewKeyCombo = "kCPYMigrateNewKeyCombo"
-        static let folderKeyCombos = "kCPYFolderKeyCombos"
-        static let clearHistoryKeyCombo = "kCPYClearHistoryKeyCombo"
+        static let mainKeyCombo = "kQLYHotKeyMainKeyCombo"
+        static let historyKeyCombo = "kQLYHotKeyHistoryKeyCombo"
+        static let snippetKeyCombo = "kQLYHotKeySnippetKeyCombo"
+        static let migrateNewKeyCombo = "kQLYMigrateNewKeyCombo"
+        static let folderKeyCombos = "kQLYFolderKeyCombos"
+        static let clearHistoryKeyCombo = "kQLYClearHistoryKeyCombo"
     }
 
 }

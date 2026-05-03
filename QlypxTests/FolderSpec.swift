@@ -24,11 +24,11 @@ class FolderSpec: QuickSpec {
 
             it("deep copy object") {
                 // Save Value
-                let savedFolder = CPYFolder()
+                let savedFolder = QLYFolder()
                 savedFolder.index = 100
                 savedFolder.title = "saved folder"
 
-                let savedSnippet = CPYSnippet()
+                let savedSnippet = QLYSnippet()
                 savedSnippet.index = 10
                 savedSnippet.title = "saved snippet"
                 savedSnippet.content = "content"
@@ -53,18 +53,18 @@ class FolderSpec: QuickSpec {
             }
 
             it("Create folder") {
-                let folder = CPYFolder.create()
+                let folder = QLYFolder.create()
                 expect(folder.title) == "untitled folder"
                 expect(folder.index) == 0
 
                 dataService.upsertFolder(folder)
 
-                let folder2 = CPYFolder.create()
+                let folder2 = QLYFolder.create()
                 expect(folder2.index) == 1
             }
 
             it("Create snippet") {
-                let folder = CPYFolder()
+                let folder = QLYFolder()
                 let snippet = folder.createSnippet()
 
                 expect(snippet.title) == "untitled snippet"
@@ -81,12 +81,12 @@ class FolderSpec: QuickSpec {
         describe("Sync database") {
 
             it("Merge snippet") {
-                let folder = CPYFolder()
+                let folder = QLYFolder()
                 dataService.upsertFolder(folder)
                 let copyFolder = folder.deepCopy()
 
-                let snippet = CPYSnippet()
-                let snippet2 = CPYSnippet()
+                let snippet = QLYSnippet()
+                let snippet2 = QLYSnippet()
                 copyFolder.mergeSnippet(snippet)
                 copyFolder.mergeSnippet(snippet2)
 
@@ -99,18 +99,18 @@ class FolderSpec: QuickSpec {
             }
 
             it("Insert snippet") {
-                let folder = CPYFolder()
+                let folder = QLYFolder()
                 dataService.upsertFolder(folder)
                 let copyFolder = folder.deepCopy()
 
-                let snippet = CPYSnippet()
+                let snippet = QLYSnippet()
                 copyFolder.insertSnippet(snippet, index: 0)
                 expect(dataService.folders.first?.snippets.count) == 1
             }
 
             it("Remove snippet") {
-                let folder = CPYFolder()
-                let snippet = CPYSnippet()
+                let folder = QLYFolder()
+                let snippet = QLYSnippet()
                 folder.snippets.append(snippet)
                 dataService.upsertFolder(folder)
 
@@ -125,7 +125,7 @@ class FolderSpec: QuickSpec {
             it("Merge folder") {
                 expect(dataService.folders.count) == 0
 
-                let folder = CPYFolder()
+                let folder = QLYFolder()
                 folder.index = 100
                 folder.title = "title"
                 folder.enable = false
@@ -150,8 +150,8 @@ class FolderSpec: QuickSpec {
             }
 
             it("Remove folder") {
-                let folder = CPYFolder()
-                let snippet = CPYSnippet()
+                let folder = QLYFolder()
+                let snippet = QLYSnippet()
                 folder.snippets.append(snippet)
                 dataService.upsertFolder(folder)
 
@@ -168,9 +168,9 @@ class FolderSpec: QuickSpec {
         describe("Rearrange Index") {
 
             it("Rearrange folder index") {
-                let folder = CPYFolder()
+                let folder = QLYFolder()
                 folder.index = 100
-                let folder2 = CPYFolder()
+                let folder2 = QLYFolder()
                 folder2.index = 10
 
                 let folders = [folder, folder2]
@@ -179,12 +179,12 @@ class FolderSpec: QuickSpec {
                 let copyFolder = folder.deepCopy()
                 let copyFolder2 = folder2.deepCopy()
 
-                CPYFolder.rearrangesIndex([copyFolder, copyFolder2])
+                QLYFolder.rearrangesIndex([copyFolder, copyFolder2])
 
                 expect(copyFolder.index) == 0
                 expect(copyFolder2.index) == 1
                 // The original objects in dataService.folders should be updated because they are classes and shared?
-                // Wait, CPYFolder.rearrangesIndex calls merge() on each folder.
+                // Wait, QLYFolder.rearrangesIndex calls merge() on each folder.
                 // merge() calls dataService.upsertFolder(self).
                 // So the dataService.folders should have the updated values.
                 
@@ -193,10 +193,10 @@ class FolderSpec: QuickSpec {
             }
 
             it("Rearrange snippet index") {
-                let folder = CPYFolder()
-                let snippet = CPYSnippet()
+                let folder = QLYFolder()
+                let snippet = QLYSnippet()
                 snippet.index = 10
-                let snippet2 = CPYSnippet()
+                let snippet2 = QLYSnippet()
                 snippet2.index = 100
                 folder.snippets.append(snippet)
                 folder.snippets.append(snippet2)

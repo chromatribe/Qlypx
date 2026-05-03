@@ -1,5 +1,5 @@
 //
-//  CPYAppInfo.swift
+//  QLYAppInfo.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-final class CPYAppInfo: NSObject, NSSecureCoding {
+final class QLYAppInfo: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { return true }
 
     // MARK: - Properties
@@ -44,7 +44,7 @@ final class CPYAppInfo: NSObject, NSSecureCoding {
 
     // MARK: - Equatable
     override func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? CPYAppInfo else { return false }
+        guard let object = object as? QLYAppInfo else { return false }
         return identifier == object.identifier && name == object.name
     }
 

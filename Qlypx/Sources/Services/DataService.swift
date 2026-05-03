@@ -14,8 +14,8 @@ final class DataService {
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
 
-    private(set) var clips: [CPYClip] = []
-    private(set) var folders: [CPYFolder] = []
+    private(set) var clips: [QLYClip] = []
+    private(set) var folders: [QLYFolder] = []
 
     private let storageDirectory: String
 
@@ -28,7 +28,7 @@ final class DataService {
     }
 
     // MARK: - Initialize
-    init(defaults: UserDefaults = .standard, storageDirectory: String = CPYUtilities.applicationSupportFolder()) {
+    init(defaults: UserDefaults = .standard, storageDirectory: String = QLYUtilities.applicationSupportFolder()) {
         self.defaults = defaults
         self.storageDirectory = storageDirectory
         loadData()
@@ -48,13 +48,13 @@ final class DataService {
     func loadData() {
         // Load Clips
         if let data = try? Data(contentsOf: URL(fileURLWithPath: clipsPath)),
-           let decoded = try? JSONDecoder().decode([CPYClip].self, from: data) {
+           let decoded = try? JSONDecoder().decode([QLYClip].self, from: data) {
             clips = decoded
         }
 
         // Load Snippets/Folders
         if let data = try? Data(contentsOf: URL(fileURLWithPath: snippetsPath)),
-           let decoded = try? JSONDecoder().decode([CPYFolder].self, from: data) {
+           let decoded = try? JSONDecoder().decode([QLYFolder].self, from: data) {
             folders = decoded
         }
     }
@@ -80,12 +80,12 @@ final class DataService {
     }
 
     // MARK: - Clips Actions
-    func upsertClip(_ clip: CPYClip) {
+    func upsertClip(_ clip: QLYClip) {
         if let index = clips.firstIndex(where: { $0.dataHash == clip.dataHash }) {
             let existingClip = clips[index]
             // If the data paths are different, delete the old data file
             if existingClip.dataPath != clip.dataPath {
-                CPYUtilities.deleteData(at: existingClip.fullDataPath)
+                QLYUtilities.deleteData(at: existingClip.fullDataPath)
             }
             clips.remove(at: index)
         }
@@ -99,7 +99,7 @@ final class DataService {
         if clips.count > maxSize {
             let clipsToRemove = clips.suffix(from: maxSize)
             clipsToRemove.forEach { clipToRemove in
-                CPYUtilities.deleteData(at: clipToRemove.fullDataPath)
+                QLYUtilities.deleteData(at: clipToRemove.fullDataPath)
                 if !clipToRemove.thumbnailPath.isEmpty {
                     ImageCacheService.shared.removeImage(forKey: clipToRemove.thumbnailPath)
                 }
@@ -112,20 +112,20 @@ final class DataService {
     func deleteClip(with dataHash: String) {
         if let index = clips.firstIndex(where: { $0.dataHash == dataHash }) {
             let clip = clips[index]
-            CPYUtilities.deleteData(at: clip.fullDataPath)
+            QLYUtilities.deleteData(at: clip.fullDataPath)
             clips.remove(at: index)
             saveClips()
         }
     }
 
     func clearAllClips() {
-        clips.forEach { CPYUtilities.deleteData(at: $0.fullDataPath) }
+        clips.forEach { QLYUtilities.deleteData(at: $0.fullDataPath) }
         clips.removeAll()
         saveClips()
     }
 
     // MARK: - Snippets Actions
-    func upsertFolder(_ folder: CPYFolder) {
+    func upsertFolder(_ folder: QLYFolder) {
         if let index = folders.firstIndex(where: { $0.identifier == folder.identifier }) {
             folders[index] = folder
         } else {
@@ -139,7 +139,7 @@ final class DataService {
         saveSnippets()
     }
 
-    func updateFolders(_ newFolders: [CPYFolder]) {
+    func updateFolders(_ newFolders: [QLYFolder]) {
         folders = newFolders
         saveSnippets()
     }

@@ -32,6 +32,8 @@ final class MenuManager: NSObject {
     fileprivate let notificationCenter = NotificationCenter.default
     fileprivate let kMaxKeyEquivalents = 10
     fileprivate let shortenSymbol = "..."
+    
+    fileprivate var needsUpdate = true
 
     // MARK: - Enum Values
     enum StatusType: Int {
@@ -74,7 +76,7 @@ extension MenuManager {
         menu?.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
     }
 
-    func popUpSnippetFolder(_ folder: CPYFolder) {
+    func popUpSnippetFolder(_ folder: QLYFolder) {
         let folderMenu = NSMenu(title: folder.title)
         // Folder title
         let labelItem = NSMenuItem(title: folder.title, action: nil)
@@ -102,14 +104,14 @@ private extension MenuManager {
         notificationCenter.publisher(for: .clipsUpdated)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.createClipMenu()
+                self?.needsUpdate = true
             }
             .store(in: &cancellables)
 
         notificationCenter.publisher(for: .snippetsUpdated)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.createClipMenu()
+                self?.needsUpdate = true
             }
             .store(in: &cancellables)
 
@@ -137,7 +139,7 @@ private extension MenuManager {
         notificationCenter.publisher(for: Notification.Name(rawValue: Constants.Notification.closeSnippetEditor))
             .receive(on: DispatchQueue.main)
             .sink { [weak self] (_: Notification) in
-                self?.createClipMenu()
+                self?.needsUpdate = true
             }
             .store(in: &cancellables)
 
@@ -153,13 +155,24 @@ private extension MenuManager {
          Constants.UserDefaults.showColorPreviewInTheMenu,
          Constants.UserDefaults.addNumericKeyEquivalents,
          Constants.UserDefaults.maxLengthOfToolTip,
-         Constants.UserDefaults.showIconInTheMenu].forEach { key in
+         Constants.UserDefaults.showIconInTheMenu,
+         Constants.UserDefaults.language].forEach { key in
             AppEnvironment.current.defaults.qly_observe(Any.self, key)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] _ in
-                    self?.createClipMenu()
+                    self?.needsUpdate = true
                 }
                 .store(in: &cancellables)
+        }
+    }
+}
+
+// MARK: - NSMenuDelegate
+extension MenuManager: NSMenuDelegate {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        if menu == clipMenu && needsUpdate {
+            createClipMenu()
+            needsUpdate = false
         }
     }
 }
@@ -187,6 +200,7 @@ private extension MenuManager {
         clipMenu?.addItem(NSMenuItem(title: L10n.preferences, action: #selector(AppDelegate.showPreferenceWindow)))
         clipMenu?.addItem(NSMenuItem.separator())
         clipMenu?.addItem(NSMenuItem(title: L10n.quitQlypx, action: #selector(AppDelegate.terminate)))
+        clipMenu?.delegate = self
 
         statusItem?.menu = clipMenu
     }
@@ -325,7 +339,7 @@ private extension MenuManager {
         }
     }
 
-    func makeClipMenuItem(_ clip: CPYClip, relativeIndex: Int) -> NSMenuItem {
+    func makeClipMenuItem(_ clip: QLYClip, relativeIndex: Int) -> NSMenuItem {
         let isMarkWithNumber = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.menuItemsAreMarkedWithNumbers)
         let isShowToolTip = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showToolTipOnMenuItem)
         let isShowImage = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showImageInTheMenu)
@@ -437,7 +451,7 @@ private extension MenuManager {
             }
     }
 
-    func makeSnippetMenuItem(_ snippet: CPYSnippet, relativeIndex: Int) -> NSMenuItem {
+    func makeSnippetMenuItem(_ snippet: QLYSnippet, relativeIndex: Int) -> NSMenuItem {
         let isMarkWithNumber = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.menuItemsAreMarkedWithNumbers)
         let isShowIcon = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showIconInTheMenu)
         let addNumbericKeyEquivalents = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.addNumericKeyEquivalents)

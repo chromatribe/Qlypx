@@ -1,5 +1,5 @@
 //
-//  CPYSnippet.swift
+//  QLYSnippet.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-final class CPYSnippet: Codable, Equatable, Hashable, Identifiable, ObservableObject {
+final class QLYSnippet: Codable, Equatable, Hashable, Identifiable, ObservableObject {
     var id: String { identifier }
     @Published var index: Int = 0
     @Published var enable: Bool = true
@@ -54,7 +54,7 @@ final class CPYSnippet: Codable, Equatable, Hashable, Identifiable, ObservableOb
         try container.encode(identifier, forKey: .identifier)
     }
 
-    static func == (lhs: CPYSnippet, rhs: CPYSnippet) -> Bool {
+    static func == (lhs: QLYSnippet, rhs: QLYSnippet) -> Bool {
         return lhs.identifier == rhs.identifier
     }
 
@@ -64,7 +64,7 @@ final class CPYSnippet: Codable, Equatable, Hashable, Identifiable, ObservableOb
 }
 
 // MARK: - Actions
-extension CPYSnippet {
+extension QLYSnippet {
     func merge() {
         // Find folder and update
         for folder in AppEnvironment.current.dataService.folders {

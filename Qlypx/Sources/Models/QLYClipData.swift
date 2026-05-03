@@ -1,5 +1,5 @@
 //
-//  CPYClipData.swift
+//  QLYClipData.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-final class CPYClipData: NSObject, NSCoding {
+final class QLYClipData: NSObject, NSCoding {
 
     // MARK: - Properties
     fileprivate let kTypesKey       = "types"
@@ -118,7 +118,7 @@ final class CPYClipData: NSObject, NSCoding {
     }
     static var availableTypesDictinary: [NSPasteboard.PasteboardType: String] {
         var availableTypes = [NSPasteboard.PasteboardType: String]()
-        zip(CPYClipData.availableTypes, CPYClipData.availableTypesString).forEach { availableTypes[$0] = $1 }
+        zip(QLYClipData.availableTypes, QLYClipData.availableTypesString).forEach { availableTypes[$0] = $1 }
         
         // Legacy mappings
         availableTypes[.legacyString] = "String"

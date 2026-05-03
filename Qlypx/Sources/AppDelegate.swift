@@ -38,19 +38,19 @@ class AppDelegate: NSObject, NSMenuItemValidation {
     // MARK: - Class Methods
     static func storeTypesDictinary() -> [String: NSNumber] {
         var storeTypes = [String: NSNumber]()
-        CPYClipData.availableTypesString.forEach { storeTypes[$0] = NSNumber(value: true) }
+        QLYClipData.availableTypesString.forEach { storeTypes[$0] = NSNumber(value: true) }
         return storeTypes
     }
 
     // MARK: - Menu Actions
     @objc func showPreferenceWindow() {
         NSApp.activate(ignoringOtherApps: true)
-        CPYPreferencesWindowController.sharedController.showWindow(self)
+        QLYPreferencesWindowController.sharedController.showWindow(self)
     }
 
     @objc func showSnippetEditorWindow() {
         NSApp.activate(ignoringOtherApps: true)
-        CPYSnippetsEditorWindowController.sharedController.showWindow(self)
+        QLYSnippetsEditorWindowController.sharedController.showWindow(self)
     }
 
     @objc func terminate() {
@@ -82,14 +82,14 @@ class AppDelegate: NSObject, NSMenuItemValidation {
     }
 
     @objc func selectClipMenuItem(_ sender: NSMenuItem) {
-        CPYUtilities.sendCustomLog(with: "selectClipMenuItem")
+        QLYUtilities.sendCustomLog(with: "selectClipMenuItem")
         guard let primaryKey = sender.representedObject as? String else {
-            CPYUtilities.sendCustomLog(with: "Cannot fetch clip primary key")
+            QLYUtilities.sendCustomLog(with: "Cannot fetch clip primary key")
             NSSound.beep()
             return
         }
         guard let clip = AppEnvironment.current.dataService.clips.first(where: { $0.dataHash == primaryKey }) else {
-            CPYUtilities.sendCustomLog(with: "Cannot fetch clip data")
+            QLYUtilities.sendCustomLog(with: "Cannot fetch clip data")
             NSSound.beep()
             return
         }
@@ -98,14 +98,14 @@ class AppDelegate: NSObject, NSMenuItemValidation {
     }
 
     @objc func selectSnippetMenuItem(_ sender: AnyObject) {
-        CPYUtilities.sendCustomLog(with: "selectSnippetMenuItem")
+        QLYUtilities.sendCustomLog(with: "selectSnippetMenuItem")
         guard let primaryKey = sender.representedObject as? String else {
-            CPYUtilities.sendCustomLog(with: "Cannot fetch snippet primary key")
+            QLYUtilities.sendCustomLog(with: "Cannot fetch snippet primary key")
             NSSound.beep()
             return
         }
         
-        var foundSnippet: CPYSnippet?
+        var foundSnippet: QLYSnippet?
         for folder in AppEnvironment.current.dataService.folders {
             if let snippet = folder.snippets.first(where: { $0.identifier == primaryKey }) {
                 foundSnippet = snippet
@@ -114,7 +114,7 @@ class AppDelegate: NSObject, NSMenuItemValidation {
         }
         
         guard let snippet = foundSnippet else {
-            CPYUtilities.sendCustomLog(with: "Cannot fetch snippet data")
+            QLYUtilities.sendCustomLog(with: "Cannot fetch snippet data")
             NSSound.beep()
             return
         }
@@ -182,9 +182,9 @@ extension AppDelegate: NSApplicationDelegate {
         // Diagnostics
         AppEnvironment.current.diagnosticService.setup()
         // UserDefaults
-        CPYUtilities.registerUserDefaultKeys()
+        QLYUtilities.registerUserDefaultKeys()
         // SDKs
-        CPYUtilities.initSDKs()
+        QLYUtilities.initSDKs()
         // Check Accessibility Permission
         let isAccessibilityEnabled = AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
         QlyLogger.info("Accessibility enabled: \(isAccessibilityEnabled)")

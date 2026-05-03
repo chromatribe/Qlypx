@@ -10,7 +10,7 @@ final class SnippetCSVService {
     static let shared = SnippetCSVService()
     
     /// CSV形式にエクスポート
-    func export(folders: [CPYFolder]) -> String {
+    func export(folders: [QLYFolder]) -> String {
         var csvString = ""
         
         for folder in folders {

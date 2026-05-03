@@ -1,5 +1,5 @@
 //
-//  CPYPreferencesWindowController.swift
+//  QLYPreferencesWindowController.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,6 +12,7 @@ import ServiceManagement
 import KeyHolder
 import Magnet
 import UniformTypeIdentifiers
+import Combine
 
 // MARK: - Constants
 enum PreferenceLayout {
@@ -22,10 +23,12 @@ enum PreferenceLayout {
     static let topPadding: CGFloat = 48
 }
 
-final class CPYPreferencesWindowController: NSWindowController {
+final class QLYPreferencesWindowController: NSWindowController {
 
     // MARK: - Properties
-    static let sharedController = CPYPreferencesWindowController(windowNibName: "CPYPreferencesWindowController")
+    static let sharedController = QLYPreferencesWindowController(windowNibName: "QLYPreferencesWindowController")
+    
+    private var cancellables = Set<AnyCancellable>()
     
     private let viewControllers: [NSViewController] = [
         NSHostingController(rootView: GeneralSettingsView()),
@@ -97,6 +100,9 @@ final class CPYPreferencesWindowController: NSWindowController {
             window?.toolbar?.selectedItemIdentifier = firstItem.identifier
             switchView(index: 0, animate: false)
         }
+        
+        setupObservers()
+        updateTitleAndToolbar()
     }
 
     override func showWindow(_ sender: Any?) {
@@ -113,10 +119,30 @@ final class CPYPreferencesWindowController: NSWindowController {
         toolbar.autosavesConfiguration = false
         window?.toolbar = toolbar
     }
+
+    private func setupObservers() {
+        AppEnvironment.current.defaults.qly_observe(String.self, Constants.UserDefaults.language)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateTitleAndToolbar()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateTitleAndToolbar() {
+        // Update Window Title
+        self.window?.title = "\(Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Qlypx") - \(L10n.preferences)"
+        
+        // Update Toolbar Item Labels
+        // Resetting the toolbar is the most reliable way to refresh all item labels and images
+        let selectedIdentifier = window?.toolbar?.selectedItemIdentifier
+        setupToolbar()
+        window?.toolbar?.selectedItemIdentifier = selectedIdentifier
+    }
 }
 
 // MARK: - NSToolbarDelegate
-extension CPYPreferencesWindowController: NSToolbarDelegate {
+extension QLYPreferencesWindowController: NSToolbarDelegate {
     
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
         return ToolbarItem.allCases.map { $0.identifier }
@@ -158,9 +184,9 @@ extension CPYPreferencesWindowController: NSToolbarDelegate {
 }
 
 // MARK: - NSWindow Delegate
-extension CPYPreferencesWindowController: NSWindowDelegate {
+extension QLYPreferencesWindowController: NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
-        if let viewController = viewControllers[2] as? CPYTypePreferenceViewController {
+        if let viewController = viewControllers[2] as? QLYTypePreferenceViewController {
             AppEnvironment.current.defaults.set(viewController.storeTypes, forKey: Constants.UserDefaults.storeTypes)
             AppEnvironment.current.defaults.synchronize()
         }
@@ -173,7 +199,7 @@ extension CPYPreferencesWindowController: NSWindowDelegate {
 }
 
 // MARK: - Layout
-private extension CPYPreferencesWindowController {
+private extension QLYPreferencesWindowController {
     
     func switchView(index: Int, animate: Bool = false) {
         guard index >= 0 && index < viewControllers.count else { return }
@@ -239,7 +265,7 @@ final class SettingsStore: ObservableObject {
     @Published var storeTypes: [String: Bool] = [:]
     
     // Exclude settings
-    @Published var excludedApps: [CPYAppInfo] = []
+    @Published var excludedApps: [QLYAppInfo] = []
     
     // Hotkeys
     @Published var mainKeyCombo: KeyCombo?
@@ -283,7 +309,7 @@ final class SettingsStore: ObservableObject {
         AppEnvironment.current.defaults.synchronize()
     }
     
-    func addExcludedApp(info: CPYAppInfo) {
+    func addExcludedApp(info: QLYAppInfo) {
         AppEnvironment.current.excludeAppService.add(with: info)
         excludedApps = AppEnvironment.current.excludeAppService.applications
     }
@@ -608,7 +634,7 @@ struct ExcludeAppSettingsView: View {
         if openPanel.runModal() == .OK {
             openPanel.urls.forEach { url in
                 guard let bundle = Bundle(url: url), let info = bundle.infoDictionary else { return }
-                guard let appInfo = CPYAppInfo(info: info as [String: AnyObject]) else { return }
+                guard let appInfo = QLYAppInfo(info: info as [String: AnyObject]) else { return }
                 store.addExcludedApp(info: appInfo)
             }
         }

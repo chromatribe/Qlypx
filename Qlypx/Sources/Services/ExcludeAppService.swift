@@ -16,12 +16,12 @@ import Combine
 final class ExcludeAppService {
 
     // MARK: - Properties
-    fileprivate(set) var applications = [CPYAppInfo]()
+    fileprivate(set) var applications = [QLYAppInfo]()
     fileprivate var frontApplication = CurrentValueSubject<NSRunningApplication?, Never>(nil)
     fileprivate var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialize
-    init(applications: [CPYAppInfo]) {
+    init(applications: [QLYAppInfo]) {
         self.applications = applications
     }
 
@@ -56,13 +56,13 @@ extension ExcludeAppService {
 
 // MARK: - Add or Delete
 extension ExcludeAppService {
-    func add(with appInfo: CPYAppInfo) {
+    func add(with appInfo: QLYAppInfo) {
         if applications.contains(appInfo) { return }
         applications.append(appInfo)
         save()
     }
 
-    func delete(with appInfo: CPYAppInfo) {
+    func delete(with appInfo: QLYAppInfo) {
         applications = applications.filter { $0 != appInfo }
         save()
     }
@@ -99,7 +99,7 @@ extension ExcludeAppService {
         }
 
         // MARK: - Excluded
-        func isExcluded(applications: [CPYAppInfo]) -> Bool {
+        func isExcluded(applications: [QLYAppInfo]) -> Bool {
             return !applications.filter { macApplicationIdentifiers.contains($0.identifier) }.isEmpty
         }
 

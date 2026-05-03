@@ -1,5 +1,5 @@
 //
-//  CPYSnippetsEditorWindowController.swift
+//  QLYSnippetsEditorWindowController.swift
 //  Qlypx
 //
 
@@ -11,22 +11,23 @@ import KeyHolder
 import UniformTypeIdentifiers
 
 // MARK: - Controller
-final class CPYSnippetsEditorWindowController: NSWindowController {
+final class QLYSnippetsEditorWindowController: NSWindowController {
 
     // MARK: - Properties
-    static let sharedController: CPYSnippetsEditorWindowController = {
+    static let sharedController: QLYSnippetsEditorWindowController = {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
-        window.title = L10n.editSnippets
         window.center()
-        let controller = CPYSnippetsEditorWindowController(window: window)
+        let controller = QLYSnippetsEditorWindowController(window: window)
         controller.setupWindow()
         return controller
     }()
+    
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Setup
     private func setupWindow() {
@@ -47,6 +48,22 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
         
         // Window setup
         window.minSize = NSSize(width: 800, height: 600)
+        
+        setupObservers()
+        updateTitle()
+    }
+    
+    private func setupObservers() {
+        AppEnvironment.current.defaults.qly_observe(String.self, Constants.UserDefaults.language)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateTitle()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateTitle() {
+        self.window?.title = L10n.editSnippets
     }
 
     override func showWindow(_ sender: Any?) {
@@ -57,7 +74,7 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
 
 // MARK: - ViewModel
 final class SnippetsStore: ObservableObject {
-    @Published var folders: [CPYFolder] = []
+    @Published var folders: [QLYFolder] = []
     @Published var selectedItemId: String?
     @Published var expandedFolderIds = Set<String>()
     
@@ -76,12 +93,12 @@ final class SnippetsStore: ObservableObject {
         }
     }
     
-    var selectedFolder: CPYFolder? {
+    var selectedFolder: QLYFolder? {
         guard let id = selectedItemId else { return nil }
         return folders.first(where: { $0.id == id })
     }
     
-    var selectedSnippet: CPYSnippet? {
+    var selectedSnippet: QLYSnippet? {
         guard let id = selectedItemId else { return nil }
         for folder in folders {
             if let snippet = folder.snippets.first(where: { $0.id == id }) {
@@ -94,7 +111,7 @@ final class SnippetsStore: ObservableObject {
     // MARK: - Actions
     func addFolder() {
         let baseTitle = L10n.untitledFolder
-        let folder = CPYFolder.create()
+        let folder = QLYFolder.create()
         folder.title = uniqueFolderName(base: baseTitle)
         folder.merge()
         
@@ -107,7 +124,7 @@ final class SnippetsStore: ObservableObject {
     
     func addSnippet() {
         // Use the current selection to determine the parent folder
-        var targetFolder: CPYFolder?
+        var targetFolder: QLYFolder?
         if let folder = selectedFolder {
             targetFolder = folder
         } else if let snippet = selectedSnippet {
@@ -182,11 +199,11 @@ final class SnippetsStore: ObservableObject {
             let csvString = try String(contentsOf: url, encoding: .utf8)
             let items = SnippetCSVService.shared.parse(csvString: csvString)
             for item in items {
-                let folder: CPYFolder
+                let folder: QLYFolder
                 if let existingFolder = self.folders.first(where: { $0.title == item.folder }) {
                     folder = existingFolder
                 } else {
-                    folder = CPYFolder.create()
+                    folder = QLYFolder.create()
                     folder.title = item.folder
                     self.folders.append(folder)
                     folder.merge()
@@ -223,7 +240,7 @@ final class SnippetsStore: ObservableObject {
         return name
     }
     
-    private func uniqueSnippetName(in folder: CPYFolder, base: String) -> String {
+    private func uniqueSnippetName(in folder: QLYFolder, base: String) -> String {
         var name = base
         var count = 1
         // Search current in-memory snippets for this folder
@@ -354,7 +371,7 @@ struct SnippetsSidebarView: View {
 }
 
 struct FolderRowView: View {
-    @ObservedObject var folder: CPYFolder
+    @ObservedObject var folder: QLYFolder
     var body: some View {
         HStack {
             Image(systemName: "folder")
@@ -368,7 +385,7 @@ struct FolderRowView: View {
 }
 
 struct SnippetRowView: View {
-    @ObservedObject var snippet: CPYSnippet
+    @ObservedObject var snippet: QLYSnippet
     var body: some View {
         HStack {
             Image(systemName: "doc")
@@ -381,7 +398,7 @@ struct SnippetRowView: View {
 }
 
 struct SnippetDetailView: View {
-    @ObservedObject var snippet: CPYSnippet
+    @ObservedObject var snippet: QLYSnippet
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             TextField(L10n.untitledSnippet, text: $snippet.title)
@@ -403,7 +420,7 @@ struct SnippetDetailView: View {
 }
 
 struct FolderDetailView: View {
-    @ObservedObject var folder: CPYFolder
+    @ObservedObject var folder: QLYFolder
     @State private var keyCombo: Magnet.KeyCombo?
     
     var body: some View {

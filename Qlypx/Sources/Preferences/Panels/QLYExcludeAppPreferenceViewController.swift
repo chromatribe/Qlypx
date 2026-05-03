@@ -1,13 +1,13 @@
 import Cocoa
 import UniformTypeIdentifiers
 
-class CPYExcludeAppPreferenceViewController: NSViewController {
+class QLYExcludeAppPreferenceViewController: NSViewController {
     // MARK: - Properties
     @IBOutlet private weak var tableView: NSTableView!
 }
 
 // MARK: - IBActions
-extension CPYExcludeAppPreferenceViewController {
+extension QLYExcludeAppPreferenceViewController {
     @IBAction private func addAppButtonTapped(_ sender: AnyObject) {
         let openPanel = NSOpenPanel()
         if #available(macOS 11.0, *) {
@@ -28,7 +28,7 @@ extension CPYExcludeAppPreferenceViewController {
         let fileURLs = openPanel.urls
         fileURLs.forEach {
             guard let bundle = Bundle(url: $0), let info = bundle.infoDictionary else { return }
-            guard let appInfo = CPYAppInfo(info: info as [String: AnyObject]) else { return }
+            guard let appInfo = QLYAppInfo(info: info as [String: AnyObject]) else { return }
             AppEnvironment.current.excludeAppService.add(with: appInfo)
         }
         tableView.reloadData()
@@ -46,7 +46,7 @@ extension CPYExcludeAppPreferenceViewController {
 }
 
 // MARK: - NSTableView DataSource
-extension CPYExcludeAppPreferenceViewController: NSTableViewDataSource {
+extension QLYExcludeAppPreferenceViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
         return AppEnvironment.current.excludeAppService.applications.count
     }

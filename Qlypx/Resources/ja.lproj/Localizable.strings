@@ -41,6 +41,9 @@
 "Type" = "対応形式";
 
 "Shortcuts" = "ショートカット";
+"Others" = "その他";
+"Menu Items" = "メニュー項目";
+"Appearance" = "外観";
 
 "Updates" = "アップデート";
 
@@ -72,3 +75,27 @@
 
 "Untitled Folder" = "無題のフォルダ";
 "Untitled Snippet" = "無題のスニペット";
+
+// Preferences
+"Remember history size" = "記憶する履歴の数";
+"Order after pasting" = "貼り付け後の履歴順序";
+"Move to top" = "最上部に移動";
+"Status bar icon" = "ステータスバーのアイコン";
+"Black" = "黒";
+"White" = "白";
+"Color" = "カラー";
+"None" = "なし";
+"Send crash reports & error logs" = "クラッシュレポートとエラーログを送信する";
+"Number of items place inline" = "インライン表示する項目の数";
+"Number of items inside a folder" = "フォルダに内包する項目の数";
+"Max characters in the menu" = "メニューに表示する文字数";
+"Mark menu items with numbers" = "メニュー項目に数字を振る";
+"Display icons in menu items" = "メニュー項目にアイコンを表示する";
+"Show tool tip on a menu item" = "メニュー項目上にツールチップを表示";
+"Max length of tool tip" = "ツールチップに表示する文字数";
+"Show color code preview" = "カラーコードのプレビューを表示";
+"Show Image" = "画像を表示";
+"Width" = "幅";
+"Height" = "高さ";
+"Select clipboard types to store:" = "保存するクリップボードの形式を選択：";
+"Exclude these applications:" = "以下のアプリケーションを除外する：";

@@ -170,9 +170,6 @@ private extension MenuManager {
         statusItem?.menu = clipMenu
     }
 
-    func menuItemTitle(_ title: String, listNumber: NSInteger, isMarkWithNumber: Bool) -> String {
-        return (isMarkWithNumber) ? "\(listNumber). \(title)" : title
-    }
 
     func makeSubmenuItem(_ count: Int, start: Int, end: Int, numberOfItems: Int) -> NSMenuItem {
         var count = count
@@ -308,9 +305,19 @@ private extension MenuManager {
         let primaryPboardType = NSPasteboard.PasteboardType(rawValue: clip.primaryType)
         let clipString = clip.title
         let title = trimTitle(clipString)
-        let titleWithMark = menuItemTitle(title, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
+        
+        let displayTitle: String
+        if primaryPboardType.isImage {
+            displayTitle = L10n.image
+        } else if primaryPboardType.isPDF {
+            displayTitle = L10n.pdf
+        } else if primaryPboardType.isFileURL && title.isEmpty {
+            displayTitle = L10n.filenames
+        } else {
+            displayTitle = title
+        }
 
-        let menuItem = NSMenuItem(title: titleWithMark, action: #selector(AppDelegate.selectClipMenuItem(_:)), keyEquivalent: keyEquivalent)
+        let menuItem = NSMenuItem(title: "", action: #selector(AppDelegate.selectClipMenuItem(_:)), keyEquivalent: keyEquivalent)
         menuItem.representedObject = clip.dataHash
 
         if isShowToolTip {
@@ -319,22 +326,38 @@ private extension MenuManager {
             menuItem.toolTip = (clipString as NSString).substring(to: toIndex)
         }
 
-        if primaryPboardType.isImage {
-            menuItem.title = menuItemTitle(L10n.image, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
-        } else if primaryPboardType.isPDF {
-            menuItem.title = menuItemTitle(L10n.pdf, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
-        } else if primaryPboardType.isFileURL && title.isEmpty {
-            menuItem.title = menuItemTitle(L10n.filenames, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
+        let updateAttributedTitle: (NSImage?) -> Void = { [weak menuItem] thumbImage in
+            guard let menuItem = menuItem else { return }
+            let attrTitle = NSMutableAttributedString()
+            
+            // Number
+            if isMarkWithNumber {
+                attrTitle.append(NSAttributedString(string: "\(listNumber). ", attributes: [.font: NSFont.menuFont(ofSize: 0)]))
+            }
+            
+            // Image (Thumbnail)
+            if let img = thumbImage {
+                let attachment = NSTextAttachment()
+                attachment.image = img
+                // Align image vertically with text
+                let font = NSFont.menuFont(ofSize: 0)
+                attachment.bounds = CGRect(x: 0, y: font.descender, width: img.size.width, height: img.size.height)
+                
+                attrTitle.append(NSAttributedString(attachment: attachment))
+                attrTitle.append(NSAttributedString(string: " "))
+            }
+            
+            // Title
+            attrTitle.append(NSAttributedString(string: displayTitle, attributes: [.font: NSFont.menuFont(ofSize: 0)]))
+            menuItem.attributedTitle = attrTitle
         }
 
-        if !clip.thumbnailPath.isEmpty && !clip.isColorCode && isShowImage {
-            ImageCacheService.shared.image(forKey: clip.thumbnailPath) { [weak menuItem] _, image in
-                menuItem?.image = image
-            }
-        }
-        if !clip.thumbnailPath.isEmpty && clip.isColorCode && isShowColorCode {
-            ImageCacheService.shared.image(forKey: clip.thumbnailPath) { [weak menuItem] _, image in
-                menuItem?.image = image
+        // Initial title without image
+        updateAttributedTitle(nil)
+
+        if !clip.thumbnailPath.isEmpty && ((!clip.isColorCode && isShowImage) || (clip.isColorCode && isShowColorCode)) {
+            ImageCacheService.shared.image(forKey: clip.thumbnailPath) { _, image in
+                updateAttributedTitle(image)
             }
         }
 
@@ -386,12 +409,31 @@ private extension MenuManager {
         let isShowIcon = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showIconInTheMenu)
 
         let title = trimTitle(snippet.title)
-        let titleWithMark = menuItemTitle(title, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
-
-        let menuItem = NSMenuItem(title: titleWithMark, action: #selector(AppDelegate.selectSnippetMenuItem(_:)), keyEquivalent: "")
+        let menuItem = NSMenuItem(title: "", action: #selector(AppDelegate.selectSnippetMenuItem(_:)), keyEquivalent: "")
         menuItem.representedObject = snippet.identifier
         menuItem.toolTip = snippet.content
-        menuItem.image = (isShowIcon) ? snippetIcon : nil
+
+        let attrTitle = NSMutableAttributedString()
+        
+        // Number
+        if isMarkWithNumber {
+            attrTitle.append(NSAttributedString(string: "\(listNumber). ", attributes: [.font: NSFont.menuFont(ofSize: 0)]))
+        }
+        
+        // Icon
+        if isShowIcon {
+            let attachment = NSTextAttachment()
+            attachment.image = snippetIcon
+            let font = NSFont.menuFont(ofSize: 0)
+            attachment.bounds = CGRect(x: 0, y: font.descender, width: snippetIcon.size.width, height: snippetIcon.size.height)
+            
+            attrTitle.append(NSAttributedString(attachment: attachment))
+            attrTitle.append(NSAttributedString(string: " "))
+        }
+        
+        // Title
+        attrTitle.append(NSAttributedString(string: title, attributes: [.font: NSFont.menuFont(ofSize: 0)]))
+        menuItem.attributedTitle = attrTitle
 
         return menuItem
     }

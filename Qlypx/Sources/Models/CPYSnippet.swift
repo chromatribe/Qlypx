@@ -12,12 +12,21 @@
 
 import Cocoa
 
-final class CPYSnippet: Codable, Equatable, Hashable {
-    var index: Int = 0
-    var enable: Bool = true
-    var title: String = ""
-    var content: String = ""
+final class CPYSnippet: Codable, Equatable, Hashable, Identifiable, ObservableObject {
+    var id: String { identifier }
+    @Published var index: Int = 0
+    @Published var enable: Bool = true
+    @Published var title: String = ""
+    @Published var content: String = ""
     var identifier: String = UUID().uuidString
+
+    enum CodingKeys: String, CodingKey {
+        case index
+        case enable
+        case title
+        case content
+        case identifier
+    }
 
     init(index: Int = 0, enable: Bool = true, title: String = "", content: String = "", identifier: String = UUID().uuidString) {
         self.index = index
@@ -25,6 +34,24 @@ final class CPYSnippet: Codable, Equatable, Hashable {
         self.title = title
         self.content = content
         self.identifier = identifier
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        index = try container.decode(Int.self, forKey: .index)
+        enable = try container.decode(Bool.self, forKey: .enable)
+        title = try container.decode(String.self, forKey: .title)
+        content = try container.decode(String.self, forKey: .content)
+        identifier = try container.decode(String.self, forKey: .identifier)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(index, forKey: .index)
+        try container.encode(enable, forKey: .enable)
+        try container.encode(title, forKey: .title)
+        try container.encode(content, forKey: .content)
+        try container.encode(identifier, forKey: .identifier)
     }
 
     static func == (lhs: CPYSnippet, rhs: CPYSnippet) -> Bool {

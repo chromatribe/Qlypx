@@ -88,7 +88,7 @@ struct AppEnvironment {
         var excludeApplications = [CPYAppInfo]()
         if let data = defaults.object(forKey: Constants.UserDefaults.excludeApplications) as? Data {
             do {
-                if let applications = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSArray.self, CPYAppInfo.self], from: data) as? [CPYAppInfo] {
+                if let applications = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSArray.self, CPYAppInfo.self, NSString.self], from: data) as? [CPYAppInfo] {
                     excludeApplications = applications
                 }
             } catch {

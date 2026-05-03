@@ -6,23 +6,33 @@
 //  HP: https://qlypx-app.com
 //
 //  Created by Econa77 on 2016/02/25.
-//
-//  Copyright © 2015-2018 Qlypx Project.
-//
-
 import Cocoa
+import SwiftUI
+import ServiceManagement
+import KeyHolder
+import Magnet
+import UniformTypeIdentifiers
+
+// MARK: - Constants
+enum PreferenceLayout {
+    static let minWidth: CGFloat = 520
+    static let minHeight: CGFloat = 550
+    static let horizontalPadding: CGFloat = 52
+    static let bottomPadding: CGFloat = 52
+    static let topPadding: CGFloat = 48
+}
 
 final class CPYPreferencesWindowController: NSWindowController {
 
     // MARK: - Properties
     static let sharedController = CPYPreferencesWindowController(windowNibName: "CPYPreferencesWindowController")
     
-    private let viewControllers = [
-        NSViewController(nibName: "CPYGeneralPreferenceViewController", bundle: nil),
-        NSViewController(nibName: "CPYMenuPreferenceViewController", bundle: nil),
-        CPYTypePreferenceViewController(nibName: "CPYTypePreferenceViewController", bundle: nil),
-        CPYExcludeAppPreferenceViewController(nibName: "CPYExcludeAppPreferenceViewController", bundle: nil),
-        CPYShortcutsPreferenceViewController(nibName: "CPYShortcutsPreferenceViewController", bundle: nil)
+    private let viewControllers: [NSViewController] = [
+        NSHostingController(rootView: GeneralSettingsView()),
+        NSHostingController(rootView: MenuSettingsView()),
+        NSHostingController(rootView: TypeSettingsView()),
+        NSHostingController(rootView: ExcludeAppSettingsView()),
+        NSHostingController(rootView: ShortcutsSettingsView())
     ]
 
     private enum ToolbarItem: String, CaseIterable {
@@ -74,6 +84,11 @@ final class CPYPreferencesWindowController: NSWindowController {
         self.window?.contentView?.wantsLayer = true
         self.window?.contentView?.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
         self.window?.makeFirstResponder(nil)
+
+        // リサイズを可能にし、最小サイズを設定
+        self.window?.styleMask.insert(.resizable)
+        self.window?.minSize = NSSize(width: PreferenceLayout.minWidth, height: PreferenceLayout.minHeight)
+        self.window?.setContentSize(NSSize(width: PreferenceLayout.minWidth, height: PreferenceLayout.minHeight))
 
         setupToolbar()
         
@@ -193,6 +208,421 @@ private extension CPYPreferencesWindowController {
         // 5. 最後にフォーカスを移す
         DispatchQueue.main.async {
             currentWindow.makeFirstResponder(newView)
+        }
+    }
+}
+
+// MARK: - Settings Store
+final class SettingsStore: ObservableObject {
+    @AppStorage(Constants.UserDefaults.maxHistorySize) var maxHistorySize: Int = 50
+    @AppStorage(Constants.UserDefaults.reorderClipsAfterPasting) var reorderClipsAfterPasting: Int = 1
+    @AppStorage(Constants.UserDefaults.showStatusItem) var showStatusItem: Int = 1
+    @AppStorage(Constants.UserDefaults.loginItem) var loginItem: Bool = false
+    @AppStorage(Constants.UserDefaults.collectCrashReport) var collectCrashReport: Bool = true
+    
+    // Menu settings
+    @AppStorage(Constants.UserDefaults.numberOfItemsPlaceInline) var numberOfItemsPlaceInline: Int = 10
+    @AppStorage(Constants.UserDefaults.numberOfItemsPlaceInsideFolder) var numberOfItemsPlaceInsideFolder: Int = 10
+    @AppStorage(Constants.UserDefaults.maxMenuItemTitleLength) var maxMenuItemTitleLength: Int = 50
+    @AppStorage(Constants.UserDefaults.menuItemsAreMarkedWithNumbers) var menuItemsAreMarkedWithNumbers: Bool = true
+    @AppStorage(Constants.UserDefaults.showIconInTheMenu) var showIconInTheMenu: Bool = true
+    @AppStorage(Constants.UserDefaults.showToolTipOnMenuItem) var showToolTipOnMenuItem: Bool = true
+    @AppStorage(Constants.UserDefaults.maxLengthOfToolTip) var maxLengthOfToolTip: Int = 100
+    @AppStorage(Constants.UserDefaults.showColorPreviewInTheMenu) var showColorPreview: Bool = true
+    @AppStorage(Constants.UserDefaults.showImageInTheMenu) var showImageInTheMenu: Bool = true
+    @AppStorage(Constants.UserDefaults.thumbnailWidth) var thumbnailWidth: Int = 200
+    @AppStorage(Constants.UserDefaults.thumbnailHeight) var thumbnailHeight: Int = 160
+
+    // Type settings
+    @Published var storeTypes: [String: Bool] = [:]
+    
+    // Exclude settings
+    @Published var excludedApps: [CPYAppInfo] = []
+    
+    // Hotkeys
+    @Published var mainKeyCombo: KeyCombo?
+    @Published var historyKeyCombo: KeyCombo?
+    @Published var snippetKeyCombo: KeyCombo?
+    @Published var clearHistoryKeyCombo: KeyCombo?
+
+    init() {
+        // Initialize Type settings
+        if let dict = AppEnvironment.current.defaults.object(forKey: Constants.UserDefaults.storeTypes) as? [String: Bool] {
+            self.storeTypes = dict
+        } else {
+            self.storeTypes = ["String": true, "RTF": true, "RTFD": true, "PDF": true, "Filenames": true, "URL": true, "TIFF": true]
+        }
+        
+        // Initialize Exclude settings
+        self.excludedApps = AppEnvironment.current.excludeAppService.applications
+        
+        // Initialize Hotkeys
+        self.mainKeyCombo = AppEnvironment.current.hotKeyService.mainKeyCombo
+        self.historyKeyCombo = AppEnvironment.current.hotKeyService.historyKeyCombo
+        self.snippetKeyCombo = AppEnvironment.current.hotKeyService.snippetKeyCombo
+        self.clearHistoryKeyCombo = AppEnvironment.current.hotKeyService.clearHistoryKeyCombo
+    }
+
+    func updateLoginItem(enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            QlyLogger.error("Failed to update login item: \(error)")
+        }
+    }
+    
+    func setStoreType(_ type: String, enabled: Bool) {
+        storeTypes[type] = enabled
+        AppEnvironment.current.defaults.set(storeTypes, forKey: Constants.UserDefaults.storeTypes)
+        AppEnvironment.current.defaults.synchronize()
+    }
+    
+    func addExcludedApp(info: CPYAppInfo) {
+        AppEnvironment.current.excludeAppService.add(with: info)
+        excludedApps = AppEnvironment.current.excludeAppService.applications
+    }
+    
+    func deleteExcludedApp(at offsets: IndexSet) {
+        offsets.forEach { index in
+            AppEnvironment.current.excludeAppService.delete(with: index)
+        }
+        excludedApps = AppEnvironment.current.excludeAppService.applications
+    }
+    
+    func updateHotKey(type: MenuType, keyCombo: KeyCombo?) {
+        AppEnvironment.current.hotKeyService.change(with: type, keyCombo: keyCombo)
+        switch type {
+        case .main: mainKeyCombo = keyCombo
+        case .history: historyKeyCombo = keyCombo
+        case .snippet: snippetKeyCombo = keyCombo
+        }
+    }
+    
+    func updateClearHistoryHotKey(keyCombo: KeyCombo?) {
+        AppEnvironment.current.hotKeyService.changeClearHistoryKeyCombo(keyCombo)
+        clearHistoryKeyCombo = keyCombo
+    }
+}
+
+// MARK: - Bridge Components
+struct ShortcutRecordViewWrapper: NSViewRepresentable {
+    let keyCombo: KeyCombo?
+    let onChange: (KeyCombo?) -> Void
+    
+    func makeNSView(context: Context) -> RecordView {
+        let recordView = RecordView(frame: .zero)
+        recordView.delegate = context.coordinator
+        recordView.keyCombo = keyCombo
+        return recordView
+    }
+    
+    func updateNSView(_ nsView: RecordView, context: Context) {
+        nsView.keyCombo = keyCombo
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, RecordViewDelegate {
+        var parent: ShortcutRecordViewWrapper
+        
+        init(_ parent: ShortcutRecordViewWrapper) {
+            self.parent = parent
+        }
+        
+        func recordViewShouldBeginRecording(_ recordView: RecordView) -> Bool { true }
+        func recordView(_ recordView: RecordView, canRecordKeyCombo keyCombo: KeyCombo) -> Bool { true }
+        func recordView(_ recordView: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
+            parent.onChange(keyCombo)
+        }
+        func recordViewDidEndRecording(_ recordView: RecordView) {}
+    }
+}
+
+// MARK: - SwiftUI Views
+struct GeneralSettingsView: View {
+    @StateObject private var store = SettingsStore()
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                // Clipboard History
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.history).font(.headline)
+                    HStack {
+                        Text(L10n.rememberHistorySize + ":")
+                        Stepper("\(store.maxHistorySize)", value: $store.maxHistorySize, in: 1...1000)
+                    }
+                    Picker(L10n.orderAfterPasting + ":", selection: $store.reorderClipsAfterPasting) {
+                        Text(L10n.none).tag(0)
+                        Text(L10n.moveToTop).tag(1)
+                    }
+                    .pickerStyle(.radioGroup)
+                }
+                
+                Divider()
+                
+                // Appearance
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.appearance).font(.headline)
+                    Picker(L10n.statusBarIcon + ":", selection: $store.showStatusItem) {
+                        Text(L10n.black).tag(1)
+                        Text(L10n.white).tag(2)
+                        Text(L10n.color).tag(3)
+                        Text(L10n.none).tag(0)
+                    }
+                }
+                
+                Divider()
+                
+                // Others
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.others).font(.headline)
+                    Toggle(L10n.launchOnSystemStartup, isOn: $store.loginItem)
+                        .onChange(of: store.loginItem) { newValue in
+                            store.updateLoginItem(enabled: newValue)
+                        }
+                    Toggle(L10n.sendCrashReportsErrorLogs, isOn: $store.collectCrashReport)
+                }
+            }
+            .padding(.horizontal, PreferenceLayout.horizontalPadding)
+            .padding(.bottom, PreferenceLayout.bottomPadding)
+            .padding(.top, PreferenceLayout.topPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(minWidth: PreferenceLayout.minWidth, maxWidth: .infinity, minHeight: PreferenceLayout.minHeight, maxHeight: .infinity)
+    }
+}
+
+struct MenuSettingsView: View {
+    @StateObject private var store = SettingsStore()
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                // Menu Items
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.menuItems).font(.headline)
+                    HStack {
+                        Text(L10n.numberOfItemsPlaceInline + ":")
+                        Stepper("\(store.numberOfItemsPlaceInline)", value: $store.numberOfItemsPlaceInline, in: 1...100)
+                    }
+                    HStack {
+                        Text(L10n.numberOfItemsInsideAFolder + ":")
+                        Stepper("\(store.numberOfItemsPlaceInsideFolder)", value: $store.numberOfItemsPlaceInsideFolder, in: 1...100)
+                    }
+                    HStack {
+                        Text(L10n.maxCharactersInTheMenu + ":")
+                        Stepper("\(store.maxMenuItemTitleLength)", value: $store.maxMenuItemTitleLength, in: 1...500)
+                    }
+                }
+                
+                Divider()
+                
+                // Appearance
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.appearance).font(.headline)
+                    Toggle(L10n.markMenuItemsWithNumbers, isOn: $store.menuItemsAreMarkedWithNumbers)
+                    Toggle(L10n.displayIconsInMenuItems, isOn: $store.showIconInTheMenu)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle(L10n.showToolTipOnAMenuItem, isOn: $store.showToolTipOnMenuItem)
+                        if store.showToolTipOnMenuItem {
+                            HStack {
+                                Text(L10n.maxLengthOfToolTip + ":")
+                                Stepper("\(store.maxLengthOfToolTip)", value: $store.maxLengthOfToolTip, in: 1...1000)
+                            }
+                            .padding(.leading, 20)
+                        }
+                    }
+                    
+                    Toggle(L10n.showColorCodePreview, isOn: $store.showColorPreview)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle(L10n.showImage, isOn: $store.showImageInTheMenu)
+                        if store.showImageInTheMenu {
+                            HStack {
+                                Text(L10n.width + ":")
+                                Stepper("\(store.thumbnailWidth)", value: $store.thumbnailWidth, in: 10...500)
+                                Text("px")
+                                Spacer().frame(width: 20)
+                                Text(L10n.height + ":")
+                                Stepper("\(store.thumbnailHeight)", value: $store.thumbnailHeight, in: 10...500)
+                                Text("px")
+                            }
+                            .padding(.leading, 20)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, PreferenceLayout.horizontalPadding)
+            .padding(.bottom, PreferenceLayout.bottomPadding)
+            .padding(.top, PreferenceLayout.topPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(minWidth: PreferenceLayout.minWidth, maxWidth: .infinity, minHeight: PreferenceLayout.minHeight, maxHeight: .infinity)
+    }
+}
+
+struct TypeSettingsView: View {
+    @StateObject private var store = SettingsStore()
+    
+    let types = [
+        ("String", "Plain Text"),
+        ("RTF", "Rich Text Format (RTF)"),
+        ("RTFD", "Rich Text Format Directory (RTFD)"),
+        ("PDF", "PDF"),
+        ("Filenames", "Filenames"),
+        ("URL", "URL"),
+        ("TIFF", "TIFF Image")
+    ]
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.selectClipboardTypesToStore).font(.headline)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(types, id: \.0) { typeKey, label in
+                            Toggle(label, isOn: Binding(
+                                get: { store.storeTypes[typeKey] ?? false },
+                                set: { store.setStoreType(typeKey, enabled: $0) }
+                            ))
+                        }
+                    }
+                    .padding(.leading, 4)
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, PreferenceLayout.horizontalPadding)
+            .padding(.bottom, PreferenceLayout.bottomPadding)
+            .padding(.top, PreferenceLayout.topPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(minWidth: PreferenceLayout.minWidth, maxWidth: .infinity, minHeight: PreferenceLayout.minHeight, maxHeight: .infinity)
+    }
+}
+
+struct ExcludeAppSettingsView: View {
+    @StateObject private var store = SettingsStore()
+    
+    @State private var selectedAppId: String?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(L10n.excludeTheseApplications).font(.headline)
+                
+                List(selection: $selectedAppId) {
+                    ForEach(store.excludedApps, id: \.identifier) { app in
+                        HStack {
+                            if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app.identifier) {
+                                Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
+                            } else {
+                                Image(nsImage: NSWorkspace.shared.icon(for: .application))
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
+                            }
+                            Text(app.name)
+                        }
+                        .tag(app.identifier)
+                    }
+                    .onDelete(perform: store.deleteExcludedApp)
+                }
+                .listStyle(.inset)
+                .frame(minHeight: 200)
+            }
+            
+            HStack {
+                Button(action: addApp) {
+                    Image(systemName: "plus")
+                    Text(L10n.add)
+                }
+                
+                Button(action: deleteSelected) {
+                    HStack {
+                        Image(systemName: "minus")
+                        Text(L10n.delete)
+                    }
+                }
+                .disabled(selectedAppId == nil)
+                
+                Spacer()
+            }
+        }
+        .padding(.horizontal, PreferenceLayout.horizontalPadding)
+        .padding(.bottom, PreferenceLayout.bottomPadding)
+        .padding(.top, PreferenceLayout.topPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+    
+    private func deleteSelected() {
+        if let id = selectedAppId, let index = store.excludedApps.firstIndex(where: { $0.identifier == id }) {
+            store.deleteExcludedApp(at: IndexSet(integer: index))
+            selectedAppId = nil
+        }
+    }
+    
+    private func addApp() {
+        let openPanel = NSOpenPanel()
+        openPanel.allowedContentTypes = [.application]
+        openPanel.allowsMultipleSelection = true
+        openPanel.prompt = L10n.add
+        
+        if openPanel.runModal() == .OK {
+            openPanel.urls.forEach { url in
+                guard let bundle = Bundle(url: url), let info = bundle.infoDictionary else { return }
+                guard let appInfo = CPYAppInfo(info: info as [String: AnyObject]) else { return }
+                store.addExcludedApp(info: appInfo)
+            }
+        }
+    }
+}
+
+struct ShortcutsSettingsView: View {
+    @StateObject private var store = SettingsStore()
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                // Menu Shortcuts
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.menu).font(.headline)
+                    shortcutRow(label: L10n.general, keyCombo: store.mainKeyCombo) { store.updateHotKey(type: .main, keyCombo: $0) }
+                    shortcutRow(label: L10n.history, keyCombo: store.historyKeyCombo) { store.updateHotKey(type: .history, keyCombo: $0) }
+                    shortcutRow(label: L10n.snippet, keyCombo: store.snippetKeyCombo) { store.updateHotKey(type: .snippet, keyCombo: $0) }
+                }
+                
+                Divider()
+                
+                // History Shortcuts
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.history).font(.headline)
+                    shortcutRow(label: L10n.clearHistory, keyCombo: store.clearHistoryKeyCombo) { store.updateClearHistoryHotKey(keyCombo: $0) }
+                }
+            }
+            .padding(.horizontal, PreferenceLayout.horizontalPadding)
+            .padding(.bottom, PreferenceLayout.bottomPadding)
+            .padding(.top, PreferenceLayout.topPadding)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(minWidth: PreferenceLayout.minWidth, maxWidth: .infinity, minHeight: PreferenceLayout.minHeight, maxHeight: .infinity)
+    }
+    
+    private func shortcutRow(label: String, keyCombo: KeyCombo?, onChange: @escaping (KeyCombo?) -> Void) -> some View {
+        HStack {
+            Text(label + ":").frame(width: 120, alignment: .trailing)
+            ShortcutRecordViewWrapper(keyCombo: keyCombo, onChange: onChange)
+                .frame(width: 200, height: 25)
         }
     }
 }

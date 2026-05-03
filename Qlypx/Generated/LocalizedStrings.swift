@@ -82,6 +82,56 @@ internal enum L10n {
   internal static let untitledFolder = L10n.tr("Localizable", "Untitled Folder")
   /// untitled snippet
   internal static let untitledSnippet = L10n.tr("Localizable", "Untitled Snippet")
+  /// Others
+  internal static let others = L10n.tr("Localizable", "Others")
+  /// Menu Items
+  internal static let menuItems = L10n.tr("Localizable", "Menu Items")
+  /// Appearance
+  internal static let appearance = L10n.tr("Localizable", "Appearance")
+  /// Black
+  internal static let black = L10n.tr("Localizable", "Black")
+  /// Color
+  internal static let color = L10n.tr("Localizable", "Color")
+  /// Display icons in menu items
+  internal static let displayIconsInMenuItems = L10n.tr("Localizable", "Display icons in menu items")
+  /// Height
+  internal static let height = L10n.tr("Localizable", "Height")
+  /// Mark menu items with numbers
+  internal static let markMenuItemsWithNumbers = L10n.tr("Localizable", "Mark menu items with numbers")
+  /// Max characters in the menu
+  internal static let maxCharactersInTheMenu = L10n.tr("Localizable", "Max characters in the menu")
+  /// Max length of tool tip
+  internal static let maxLengthOfToolTip = L10n.tr("Localizable", "Max length of tool tip")
+  /// Move to top
+  internal static let moveToTop = L10n.tr("Localizable", "Move to top")
+  /// None
+  internal static let none = L10n.tr("Localizable", "None")
+  /// Number of items inside a folder
+  internal static let numberOfItemsInsideAFolder = L10n.tr("Localizable", "Number of items inside a folder")
+  /// Number of items place inline
+  internal static let numberOfItemsPlaceInline = L10n.tr("Localizable", "Number of items place inline")
+  /// Order after pasting
+  internal static let orderAfterPasting = L10n.tr("Localizable", "Order after pasting")
+  /// Remember history size
+  internal static let rememberHistorySize = L10n.tr("Localizable", "Remember history size")
+  /// Send crash reports & error logs
+  internal static let sendCrashReportsErrorLogs = L10n.tr("Localizable", "Send crash reports & error logs")
+  /// Show color code preview
+  internal static let showColorCodePreview = L10n.tr("Localizable", "Show color code preview")
+  /// Show Image
+  internal static let showImage = L10n.tr("Localizable", "Show Image")
+  /// Show tool tip on a menu item
+  internal static let showToolTipOnAMenuItem = L10n.tr("Localizable", "Show tool tip on a menu item")
+  /// Status bar icon
+  internal static let statusBarIcon = L10n.tr("Localizable", "Status bar icon")
+  /// White
+  internal static let white = L10n.tr("Localizable", "White")
+  /// Width
+  internal static let width = L10n.tr("Localizable", "Width")
+  /// Select clipboard types to store:
+  internal static let selectClipboardTypesToStore = L10n.tr("Localizable", "Select clipboard types to store:")
+  /// Exclude these applications:
+  internal static let excludeTheseApplications = L10n.tr("Localizable", "Exclude these applications:")
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:enable nesting type_body_length type_name vertical_whitespace_opening_braces

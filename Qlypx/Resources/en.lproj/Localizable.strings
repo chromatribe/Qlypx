@@ -41,6 +41,9 @@
 "Type" = "Type";
 
 "Shortcuts" = "Shortcuts";
+"Others" = "Others";
+"Menu Items" = "Menu Items";
+"Appearance" = "Appearance";
 
 "Updates" = "Updates";
 
@@ -72,3 +75,27 @@
 
 "Untitled Folder" = "untitled folder";
 "Untitled Snippet" = "untitled snippet";
+
+// Preferences
+"Remember history size" = "Remember history size";
+"Order after pasting" = "Order after pasting";
+"Move to top" = "Move to top";
+"Status bar icon" = "Status bar icon";
+"Black" = "Black";
+"White" = "White";
+"Color" = "Color";
+"None" = "None";
+"Send crash reports & error logs" = "Send crash reports & error logs";
+"Number of items place inline" = "Number of items place inline";
+"Number of items inside a folder" = "Number of items inside a folder";
+"Max characters in the menu" = "Max characters in the menu";
+"Mark menu items with numbers" = "Mark menu items with numbers";
+"Display icons in menu items" = "Display icons in menu items";
+"Show tool tip on a menu item" = "Show tool tip on a menu item";
+"Max length of tool tip" = "Max length of tool tip";
+"Show color code preview" = "Show color code preview";
+"Show Image" = "Show Image";
+"Width" = "Width";
+"Height" = "Height";
+"Select clipboard types to store:" = "Select clipboard types to store:";
+"Exclude these applications:" = "Exclude these applications:";

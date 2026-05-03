@@ -3,7 +3,7 @@
 > **このファイルがプロジェクトの唯一の真実（Single Source of Truth）です。**
 > `GEMINI.md` はこのファイルへの入口として短く保ちます。
 
-**Current Version:** `1.20260503.2`
+**Current Version:** `1.20260503.8`
 
 ---
 
@@ -28,11 +28,14 @@ Qlypx は、単なる Clipy のクローンではありません。**「Apple Si
 | レイヤー | 技術 |
 |---|---|
 | 言語 | Swift 5.9+ |
-| UI フレームワーク | AppKit (NSToolbar, NSWindow, NSMenu) |
+| UI フレームワーク | **SwiftUI** (Snippet Editor / Preferences), AppKit (NSMenu, NSWindow) |
 | 非同期処理 | Combine |
 | 永続化 | JSON (Codable) |
 | ホットキー | Magnet / KeyHolder / Sauce (SPM) |
 | CI | GitHub Actions (macOS 13+) |
+
+### バージョン管理手法: `MAJOR.YYYYMMDD.連番`
+// ... (omitted for brevity in replace_file_content but I will include it in the real call)
 
 ### バージョン管理手法: `MAJOR.YYYYMMDD.連番`
 
@@ -201,7 +204,7 @@ if type.isImage { ... }
 | ファイル | 責務 |
 |---|---|
 | `CPYPreferencesWindowController.swift` | 設定ウィンドウ（NSToolbar ナビゲーション）。 |
-| `CPYSnippetsEditorWindowController.swift` | スニペットエディタウィンドウ（NSOutlineView + NSSplitView）。 |
+| `CPYSnippetsEditorWindowController.swift` | スニペットエディタウィンドウ（SwiftUI）。全機能を一つの ViewModel とビュー群に統合。 |
 | `CPYTypePreferenceViewController.swift` | 「保存する種類」設定パネル。 |
 | `CPYExcludeAppPreferenceViewController.swift` | 除外アプリ設定パネル（ドラッグ&ドロップ対応）。 |
 | `CPYShortcutsPreferenceViewController.swift` | ショートカットキー設定パネル（KeyHolder）。 |
@@ -220,7 +223,7 @@ if type.isImage { ... }
 
 | ファイル | 責務 |
 |---|---|
-| `QlyLogger.swift` | `os_log` ラッパー（debug/info/warn/error）。**DiagnosticService も同ファイルに統合。** |
+| `QlyLogger.swift` | `os_log` ラッパー（debug/info/warn/error）。**SlackNotificationService / DiagnosticService も同ファイルに統合。** |
 | `CPYUtilities.swift` | アプリサポートフォルダのパス取得・SDK 初期化・UserDefaults デフォルト値登録。 |
 | `ScreenShotObserver.swift` | `NSMetadataQuery` によるスクリーンショット生成の監視。 |
 
@@ -248,7 +251,8 @@ if type.isImage { ... }
 - **Phase 2** - Realm/RxSwift 廃止、Combine 移行、ImageCacheService、ScreenShotObserver、NSToolbar モダン化、Sparkle 廃止、スニペット共有廃止、クリーンアップ
 - **Phase 3 - i18n** - ハードコード文字列の撲滅、L10n enum への完全移行
 - **Phase 3 - Clipboard** - deprecated PasteboardType の排除、PDF/FileURL のモダン化
-- **Phase 3 - Diagnostics** - DiagnosticService（クラッシュ検知 + Web API 自動送信）、受信サーバー
+- **Phase 3 - Diagnostics** - DiagnosticService（クラッシュ検知 + Web API 自動送信）、受信サーバー、**SlackNotificationService（エラー/クラッシュの Slack 即時通知）**
+- **Phase 4 - SwiftUI** - 設定画面、スニペットエディタの完全 SwiftUI 移行完了。
 
 ### 🚧 進行中 / 未着手
 
@@ -266,6 +270,36 @@ if type.isImage { ... }
 - **Feature**: 重複コピー時に「上書きして先頭に移動」する挙動を標準化。
 - **UI**: 設定パネルから冗長な項目（Cmd+V自動入力、数字キーショートカット、0開始設定等）を削除し、レイアウトを最適化。
 - **Logic**: `DataService` と `ClipService` の重複処理ロジックを統合・簡略化。
+
+### 1.20260503.8
+- **Modernization**: スニペットエディタを完全に SwiftUI 移行。`NavigationSplitView` によるモダンな 2 ペインレイアウトを採用。
+- **Feature**: `SlackNotificationService` を実装。配布版アプリで発生したエラーやクラッシュをリアルタイムで Slack へ通知する仕組みを導入。
+- **UI/UX**: メニュー項目のレイアウトを `attributedTitle` で刷新。画像がある場合でも「番号. [画像] タイトル」の順で綺麗に整列するように改善。
+- **Refactor**: `CPYFolder` および `CPYSnippet` を `Identifiable` / `ObservableObject` 化し、SwiftUI との親和性を向上。
+- **Fix**: ウィンドウホスト時のレイアウト再帰呼び出し警告を修正。
+
+### 1.20260503.7
+- **UI/UX**: 全タブのレイアウト構造（余白、見出しスタイル）を完全に同期し、視覚的な一貫性を向上。
+- **UI/UX**: 「対応形式」および「除外アプリ」タブのスペーシングを修正。
+
+### 1.20260503.6
+- **UI/UX**: `Layout` 定数を導入し、ウィンドウサイズ（520x550）と全タブの余白を一貫して管理。
+- **UI/UX**: 上部余白を 48px に増やし、ツールバーへのコンテンツ食い込みを完全に修正。
+- **UI/UX**: 除外アプリ画面に「－（削除）」ボタンを追加。
+
+### 1.20260503.5
+- **UI/UX**: 設定画面のレイアウトを左上（topLeading）固定に統一し、ウィンドウ縮小時のコンテンツ食い込みを修正。
+- **UI/UX**: 全タブの余白を左右下 52px に最適化。
+- **i18n**: 設定画面内のハードコード文字列を完全に排除し、L10n 移行を完了。
+
+### 1.20260503.4
+- **UI/UX**: 設定画面の全5タブを完全に SwiftUI へ移行。
+- **Modernization**: ウィンドウのリサイズ対応と最新 API (SMAppService, UTType) への準拠。
+- **Fix**: `CPYAppInfo` のアイコン取得ロジックの修正。
+
+### 1.20260503.3
+- **Modernization**: 設定画面（一般・メニュー）の SwiftUI 移行。
+- **Feature**: ログイン時起動の `SMAppService` 対応。
 
 ### 1.20260503.1
 - **Modernization**: クリップボード処理を `deprecated` 定数から最新 API に刷新。PDF/FileURL の互換性向上。

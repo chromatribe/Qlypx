@@ -5,7 +5,7 @@ final class UpdateService {
     
     // MARK: - Properties
     private let versionURL = URL(string: "https://raw.githubusercontent.com/qlypx/Qlypx/main/version.json")!
-    private let downloadURL = URL(string: "https://qlypx-app.com/download")!
+    private let downloadURL = URL(string: "https://chromatri.be/download")!
     
     // MARK: - Update Check
     func checkForUpdates(isManual: Bool = false) {

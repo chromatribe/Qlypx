@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2015/06/21.
 //
@@ -81,9 +81,9 @@
 "Order after pasting" = "Order after pasting";
 "Move to top" = "Move to top";
 "Status bar icon" = "Status bar icon";
-"Black" = "Black";
-"White" = "White";
-"Color" = "Color";
+"Black" = "Solid";
+"White" = "Line";
+"Color" = "App Icon";
 "None" = "None";
 "Send crash reports & error logs" = "Send crash reports & error logs";
 "Number of items place inline" = "Number of items place inline";
@@ -99,3 +99,25 @@
 "Height" = "Height";
 "Select clipboard types to store:" = "Select clipboard types to store:";
 "Exclude these applications:" = "Exclude these applications:";
+
+"Monitoring Speed" = "Clipboard Monitoring Speed";
+"High Speed (0.2s)" = "High Speed (0.2s)";
+"Fast (0.5s)" = "Fast (0.5s)";
+"Standard (0.75s)" = "Standard (0.75s)";
+"Power Saving (1.0s)" = "Power Saving (1.0s)";
+
+"Language" = "Language";
+"System Language" = "System Language";
+"Japanese" = "Japanese";
+"English" = "English";
+"German" = "German";
+"Italian" = "Italian";
+"Simplified Chinese" = "Simplified Chinese";
+
+"Plain Text" = "Plain Text";
+"Rich Text Format (RTF)" = "Rich Text Format (RTF)";
+"Rich Text Format Directory (RTFD)" = "Rich Text Format Directory (RTFD)";
+"PDF" = "PDF";
+"Filenames" = "Filenames";
+"URL" = "URL";
+"TIFF Image" = "TIFF Image";

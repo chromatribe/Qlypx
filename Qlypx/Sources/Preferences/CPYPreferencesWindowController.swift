@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2016/02/25.
 import Cocoa
@@ -219,6 +219,8 @@ final class SettingsStore: ObservableObject {
     @AppStorage(Constants.UserDefaults.showStatusItem) var showStatusItem: Int = 1
     @AppStorage(Constants.UserDefaults.loginItem) var loginItem: Bool = false
     @AppStorage(Constants.UserDefaults.collectCrashReport) var collectCrashReport: Bool = true
+    @AppStorage(Constants.UserDefaults.monitoringSpeed) var monitoringSpeed: Double = 0.75
+    @AppStorage(Constants.UserDefaults.language) var language: String = "System"
     
     // Menu settings
     @AppStorage(Constants.UserDefaults.numberOfItemsPlaceInline) var numberOfItemsPlaceInline: Int = 10
@@ -367,6 +369,20 @@ struct GeneralSettingsView: View {
                 
                 Divider()
                 
+                // Monitoring Speed
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.monitoringSpeed).font(.headline)
+                    Picker("", selection: $store.monitoringSpeed) {
+                        Text(L10n.highSpeed).tag(0.2)
+                        Text(L10n.fast).tag(0.5)
+                        Text(L10n.standard).tag(0.75)
+                        Text(L10n.powerSaving).tag(1.0)
+                    }
+                    .pickerStyle(.radioGroup)
+                }
+                
+                Divider()
+                
                 // Appearance
                 VStack(alignment: .leading, spacing: 12) {
                     Text(L10n.appearance).font(.headline)
@@ -388,6 +404,17 @@ struct GeneralSettingsView: View {
                             store.updateLoginItem(enabled: newValue)
                         }
                     Toggle(L10n.sendCrashReportsErrorLogs, isOn: $store.collectCrashReport)
+                    
+                    Divider().padding(.vertical, 4)
+                    
+                    Picker(L10n.language + ":", selection: $store.language) {
+                        Text(L10n.systemLanguage).tag("System")
+                        Text(L10n.japanese).tag("Japanese")
+                        Text(L10n.english).tag("English")
+                        Text(L10n.german).tag("German")
+                        Text(L10n.italian).tag("Italian")
+                        Text(L10n.simplifiedChinese).tag("Simplified Chinese")
+                    }
                 }
             }
             .padding(.horizontal, PreferenceLayout.horizontalPadding)
@@ -473,13 +500,13 @@ struct TypeSettingsView: View {
     @StateObject private var store = SettingsStore()
     
     let types = [
-        ("String", "Plain Text"),
-        ("RTF", "Rich Text Format (RTF)"),
-        ("RTFD", "Rich Text Format Directory (RTFD)"),
-        ("PDF", "PDF"),
-        ("Filenames", "Filenames"),
-        ("URL", "URL"),
-        ("TIFF", "TIFF Image")
+        ("String", L10n.plainText),
+        ("RTF", L10n.rtf),
+        ("RTFD", L10n.rtfd),
+        ("PDF", L10n.pdf),
+        ("Filenames", L10n.filenames),
+        ("URL", L10n.url),
+        ("TIFF", L10n.tiffImage)
     ]
     
     var body: some View {

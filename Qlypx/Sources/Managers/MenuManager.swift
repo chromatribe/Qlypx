@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2016/03/08.
 //
@@ -81,12 +81,12 @@ extension MenuManager {
         labelItem.isEnabled = false
         folderMenu.addItem(labelItem)
         // Snippets
-        var index = firstIndexOfMenuItems()
+        var index = 0
         folder.snippets
             .sorted(by: { $0.index < $1.index })
             .filter { $0.enable }
             .forEach { snippet in
-                let subMenuItem = makeSnippetMenuItem(snippet, listNumber: index)
+                let subMenuItem = makeSnippetMenuItem(snippet, relativeIndex: index)
                 folderMenu.addItem(subMenuItem)
                 index += 1
             }
@@ -213,12 +213,33 @@ private extension MenuManager {
         return subMenuItem
     }
 
-    func incrementListNumber(_ listNumber: NSInteger, max: NSInteger, start: NSInteger) -> NSInteger {
-        var listNumber = listNumber + 1
-        if listNumber == max && max == 10 && start == 1 {
-            listNumber = 0
+    func shortcut(for relativeIndex: Int) -> String {
+        let isStartFromZero = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.menuItemsTitleStartWithZero)
+        
+        if isStartFromZero {
+            // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, a, b, c...
+            if relativeIndex < 10 {
+                return "\(relativeIndex)"
+            } else {
+                let alphaIndex = relativeIndex - 10
+                if alphaIndex < 26 {
+                    return String(Character(UnicodeScalar(UInt8(ascii: "a") + UInt8(alphaIndex))))
+                }
+            }
+        } else {
+            // 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, a, b, c...
+            if relativeIndex < 9 {
+                return "\(relativeIndex + 1)"
+            } else if relativeIndex == 9 {
+                return "0"
+            } else {
+                let alphaIndex = relativeIndex - 10
+                if alphaIndex < 26 {
+                    return String(Character(UnicodeScalar(UInt8(ascii: "a") + UInt8(alphaIndex))))
+                }
+            }
         }
-        return listNumber
+        return ""
     }
 
     func trimTitle(_ title: String?) -> String {
@@ -258,7 +279,7 @@ private extension MenuManager {
 
         // History
         let firstIndex = firstIndexOfMenuItems()
-        var listNumber = firstIndex
+        var relativeIndex = 0
         var subMenuCount = placeInLine
         var subMenuIndex = 1 + placeInLine
 
@@ -278,20 +299,20 @@ private extension MenuManager {
                 if i == subMenuCount {
                     let subMenuItem = makeSubmenuItem(subMenuCount, start: firstIndex, end: currentSize, numberOfItems: placeInsideFolder)
                     menu.addItem(subMenuItem)
-                    listNumber = firstIndex
+                    relativeIndex = 0
                 }
 
                 // Clip
                 if let subMenu = menu.item(at: subMenuIndex)?.submenu {
-                    let menuItem = makeClipMenuItem(clip, index: i, listNumber: listNumber)
+                    let menuItem = makeClipMenuItem(clip, relativeIndex: relativeIndex)
                     subMenu.addItem(menuItem)
-                    listNumber = incrementListNumber(listNumber, max: placeInsideFolder, start: firstIndex)
+                    relativeIndex += 1
                 }
             } else {
                 // Clip
-                let menuItem = makeClipMenuItem(clip, index: i, listNumber: listNumber)
+                let menuItem = makeClipMenuItem(clip, relativeIndex: relativeIndex)
                 menu.addItem(menuItem)
-                listNumber = incrementListNumber(listNumber, max: placeInLine, start: firstIndex)
+                relativeIndex += 1
             }
 
             i += 1
@@ -304,24 +325,14 @@ private extension MenuManager {
         }
     }
 
-    func makeClipMenuItem(_ clip: CPYClip, index: Int, listNumber: Int) -> NSMenuItem {
+    func makeClipMenuItem(_ clip: CPYClip, relativeIndex: Int) -> NSMenuItem {
         let isMarkWithNumber = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.menuItemsAreMarkedWithNumbers)
         let isShowToolTip = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showToolTipOnMenuItem)
         let isShowImage = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showImageInTheMenu)
         let isShowColorCode = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showColorPreviewInTheMenu)
         let addNumbericKeyEquivalents = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.addNumericKeyEquivalents)
 
-        var keyEquivalent = ""
-
-        if addNumbericKeyEquivalents && (index <= kMaxKeyEquivalents) {
-            let isStartFromZero = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.menuItemsTitleStartWithZero)
-
-            var shortCutNumber = (isStartFromZero) ? index : index + 1
-            if shortCutNumber == kMaxKeyEquivalents {
-                shortCutNumber = 0
-            }
-            keyEquivalent = "\(shortCutNumber)"
-        }
+        let shortcut = (addNumbericKeyEquivalents) ? self.shortcut(for: relativeIndex) : ""
 
         let primaryPboardType = NSPasteboard.PasteboardType(rawValue: clip.primaryType)
         let clipString = clip.title
@@ -338,7 +349,8 @@ private extension MenuManager {
             displayTitle = title
         }
 
-        let menuItem = NSMenuItem(title: "", action: #selector(AppDelegate.selectClipMenuItem(_:)), keyEquivalent: keyEquivalent)
+        let menuItem = NSMenuItem(title: "", action: #selector(AppDelegate.selectClipMenuItem(_:)), keyEquivalent: shortcut)
+        menuItem.target = NSApp.delegate
         menuItem.representedObject = clip.dataHash
 
         if isShowToolTip {
@@ -353,7 +365,8 @@ private extension MenuManager {
             
             // Number
             if isMarkWithNumber {
-                attrTitle.append(NSAttributedString(string: "\(listNumber). ", attributes: [.font: NSFont.menuFont(ofSize: 0)]))
+                let label = (shortcut.isEmpty) ? "\(relativeIndex + 1)" : shortcut
+                attrTitle.append(NSAttributedString(string: "\(label). ", attributes: [.font: NSFont.menuFont(ofSize: 0)]))
             }
             
             // Image (Thumbnail)
@@ -401,7 +414,6 @@ private extension MenuManager {
         menu.addItem(labelItem)
 
         var subMenuIndex = menu.numberOfItems - 1
-        let firstIndex = firstIndexOfMenuItems()
 
         folders
             .filter { $0.enable }
@@ -411,26 +423,29 @@ private extension MenuManager {
                 menu.addItem(subMenuItem)
                 subMenuIndex += 1
 
-                var i = firstIndex
+                var relativeIndex = 0
                 folder.snippets
                     .sorted(by: { $0.index < $1.index })
                     .filter { $0.enable }
                     .forEach { snippet in
-                        let subMenuItem = makeSnippetMenuItem(snippet, listNumber: i)
+                        let subMenuItem = makeSnippetMenuItem(snippet, relativeIndex: relativeIndex)
                         if let subMenu = menu.item(at: subMenuIndex)?.submenu {
                             subMenu.addItem(subMenuItem)
-                            i += 1
+                            relativeIndex += 1
                         }
                     }
             }
     }
 
-    func makeSnippetMenuItem(_ snippet: CPYSnippet, listNumber: Int) -> NSMenuItem {
+    func makeSnippetMenuItem(_ snippet: CPYSnippet, relativeIndex: Int) -> NSMenuItem {
         let isMarkWithNumber = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.menuItemsAreMarkedWithNumbers)
         let isShowIcon = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.showIconInTheMenu)
+        let addNumbericKeyEquivalents = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.addNumericKeyEquivalents)
 
+        let shortcut = (addNumbericKeyEquivalents) ? self.shortcut(for: relativeIndex) : ""
         let title = trimTitle(snippet.title)
-        let menuItem = NSMenuItem(title: "", action: #selector(AppDelegate.selectSnippetMenuItem(_:)), keyEquivalent: "")
+        let menuItem = NSMenuItem(title: "", action: #selector(AppDelegate.selectSnippetMenuItem(_:)), keyEquivalent: shortcut)
+        menuItem.target = NSApp.delegate
         menuItem.representedObject = snippet.identifier
         menuItem.toolTip = snippet.content
 
@@ -438,7 +453,8 @@ private extension MenuManager {
         
         // Number
         if isMarkWithNumber {
-            attrTitle.append(NSAttributedString(string: "\(listNumber). ", attributes: [.font: NSFont.menuFont(ofSize: 0)]))
+            let label = (shortcut.isEmpty) ? "\(relativeIndex + 1)" : shortcut
+            attrTitle.append(NSAttributedString(string: "\(label). ", attributes: [.font: NSFont.menuFont(ofSize: 0)]))
         }
         
         // Icon
@@ -479,7 +495,7 @@ private extension MenuManager {
             image = Asset.statusbarMenuCopy.image
         case .none: return
         }
-        image?.isTemplate = true
+        image?.isTemplate = (type != .copy)
         image?.size = NSSize(width: 18, height: 18)
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)

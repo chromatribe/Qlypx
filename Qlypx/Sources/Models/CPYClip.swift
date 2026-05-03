@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2015/06/21.
 //
@@ -20,6 +20,12 @@ final class CPYClip: Codable {
     var updateTime: Int = 0
     var thumbnailPath: String = ""
     var isColorCode: Bool = false
+
+    var fullDataPath: String {
+        if dataPath.isEmpty { return "" }
+        if dataPath.hasPrefix("/") { return dataPath }
+        return (CPYUtilities.applicationSupportFolder() as NSString).appendingPathComponent(dataPath)
+    }
 
     init(dataPath: String = "", title: String = "", dataHash: String = "", primaryType: String = "", updateTime: Int = 0, thumbnailPath: String = "", isColorCode: Bool = false) {
         self.dataPath = dataPath

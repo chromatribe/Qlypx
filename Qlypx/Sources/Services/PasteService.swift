@@ -14,7 +14,7 @@ extension PasteService {
 
         let data: CPYClipData
         do {
-            let fileData = try Data(contentsOf: URL(fileURLWithPath: clip.dataPath))
+            let fileData = try Data(contentsOf: URL(fileURLWithPath: clip.fullDataPath))
             let unarchiver = try NSKeyedUnarchiver(forReadingFrom: fileData)
             unarchiver.requiresSecureCoding = false
             guard let decodedData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? CPYClipData else { return }

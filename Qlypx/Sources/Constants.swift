@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2016/04/17.
 //
@@ -67,6 +67,8 @@ struct Constants {
         static let excludeApplications = "kCPYExcludeApplications"
         static let collectCrashReport = "kCPYCollectCrashReport"
         static let showColorPreviewInTheMenu = "kCPYPrefShowColorPreviewInTheMenu"
+        static let monitoringSpeed = "kCPYPrefMonitoringSpeedKey"
+        static let language = "kCPYPrefLanguageKey"
     }
 
 

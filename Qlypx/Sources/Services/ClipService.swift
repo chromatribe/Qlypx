@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2016/11/17.
 //
@@ -21,20 +21,19 @@ final class ClipService {
     fileprivate var storeTypes = [String: NSNumber]()
     fileprivate let lock = NSRecursiveLock(name: "com.qlypx.app.ClipUpdatable")
     fileprivate var cancellables = Set<AnyCancellable>()
+    fileprivate var timerCancellable: AnyCancellable?
 
     // MARK: - Clips
     func startMonitoring() {
         cancellables = []
-        // Pasteboard observe timer
-        Timer.publish(every: 0.75, on: .main, in: .common)
-            .autoconnect()
-            .map { _ in NSPasteboard.general.changeCount }
-            .filter { [weak self] changeCount in
-                return changeCount != self?.cachedChangeCount.value
-            }
-            .sink { [weak self] changeCount in
-                self?.cachedChangeCount.send(changeCount)
-                self?.create()
+
+        // Monitoring speed
+        AppEnvironment.current.defaults.qly_observe(Double.self, Constants.UserDefaults.monitoringSpeed)
+            .compactMap { $0 }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] speed in
+                self?.setupTimer(every: speed)
             }
             .store(in: &cancellables)
 
@@ -46,6 +45,20 @@ final class ClipService {
                 self?.storeTypes = storeTypes
             }
             .store(in: &cancellables)
+    }
+
+    private func setupTimer(every interval: TimeInterval) {
+        timerCancellable?.cancel()
+        timerCancellable = Timer.publish(every: interval, on: .main, in: .common)
+            .autoconnect()
+            .map { _ in NSPasteboard.general.changeCount }
+            .filter { [weak self] changeCount in
+                return changeCount != self?.cachedChangeCount.value
+            }
+            .sink { [weak self] changeCount in
+                self?.cachedChangeCount.send(changeCount)
+                self?.create()
+            }
     }
 
     func clearAll() {
@@ -118,10 +131,11 @@ extension ClipService {
 
         // Saved time and path
         let unixTime = Int(Date().timeIntervalSince1970)
-        let savedPath = CPYUtilities.applicationSupportFolder() + "/\(NSUUID().uuidString).data"
+        let filename = "\(NSUUID().uuidString).data"
+        let savedPath = (CPYUtilities.applicationSupportFolder() as NSString).appendingPathComponent(filename)
         
         let clip = CPYClip()
-        clip.dataPath = savedPath
+        clip.dataPath = filename
         clip.title = data.stringValue[0...10000]
         clip.dataHash = "\(savedHash)"
         clip.updateTime = unixTime

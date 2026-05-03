@@ -59,6 +59,7 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
 final class SnippetsStore: ObservableObject {
     @Published var folders: [CPYFolder] = []
     @Published var selectedItemId: String?
+    @Published var expandedFolderIds = Set<String>()
     
     init() {
         refresh()
@@ -69,6 +70,8 @@ final class SnippetsStore: ObservableObject {
             self.folders = AppEnvironment.current.dataService.folders
                 .sorted(by: { $0.index < $1.index })
                 .map { $0.deepCopy() }
+            // Auto-expand all folders on load
+            self.expandedFolderIds = Set(self.folders.map { $0.id })
             self.objectWillChange.send()
         }
     }
@@ -243,10 +246,8 @@ struct SnippetsEditorView: View {
         } detail: {
             if let snippet = store.selectedSnippet {
                 SnippetDetailView(snippet: snippet)
-                    .id(snippet.id)
             } else if let folder = store.selectedFolder {
                 FolderDetailView(folder: folder)
-                    .id(folder.id)
             } else {
                 Text(L10n.snippet)
                     .font(.largeTitle)
@@ -309,22 +310,31 @@ struct SnippetsEditorView: View {
         }
     }
 }
-
 struct SnippetsSidebarView: View {
     @ObservedObject var store: SnippetsStore
-    @State private var expandedFolderIds = Set<String>()
     
     var body: some View {
-        List(selection: $store.selectedItemId) {
+        let selection = Binding<String?>(
+            get: { store.selectedItemId },
+            set: { newValue in
+                if newValue != store.selectedItemId {
+                    DispatchQueue.main.async {
+                        store.selectedItemId = newValue
+                    }
+                }
+            }
+        )
+        
+        List(selection: selection) {
             ForEach(store.folders) { folder in
                 DisclosureGroup(
                     isExpanded: Binding(
-                        get: { expandedFolderIds.contains(folder.id) },
+                        get: { store.expandedFolderIds.contains(folder.id) },
                         set: { isExpanded in
                             if isExpanded {
-                                expandedFolderIds.insert(folder.id)
+                                store.expandedFolderIds.insert(folder.id)
                             } else {
-                                expandedFolderIds.remove(folder.id)
+                                store.expandedFolderIds.remove(folder.id)
                             }
                         }
                     )
@@ -340,15 +350,6 @@ struct SnippetsSidebarView: View {
             }
         }
         .listStyle(.sidebar)
-        .onAppear {
-            // Expand all folders on initial appear
-            expandedFolderIds = Set(store.folders.map { $0.id })
-        }
-        .onChange(of: store.folders.count) { _ in
-            // When a new folder is added, ensure it is expanded
-            let allIds = Set(store.folders.map { $0.id })
-            expandedFolderIds = expandedFolderIds.union(allIds)
-        }
     }
 }
 
@@ -386,11 +387,15 @@ struct SnippetDetailView: View {
             TextField(L10n.untitledSnippet, text: $snippet.title)
                 .font(.title2)
                 .textFieldStyle(.plain)
-                .onChange(of: snippet.title) { _ in snippet.merge() }
+                .onChange(of: snippet.title) { _ in
+                    DispatchQueue.main.async { snippet.merge() }
+                }
             Divider()
             TextEditor(text: $snippet.content)
                 .font(.system(.body, design: .monospaced))
-                .onChange(of: snippet.content) { _ in snippet.merge() }
+                .onChange(of: snippet.content) { _ in
+                    DispatchQueue.main.async { snippet.merge() }
+                }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(24)
@@ -409,7 +414,9 @@ struct FolderDetailView: View {
                     .font(.title)
                     .multilineTextAlignment(.center)
                     .textFieldStyle(.plain)
-                    .onChange(of: folder.title) { _ in folder.merge() }
+                    .onChange(of: folder.title) { _ in
+                        DispatchQueue.main.async { folder.merge() }
+                    }
                 Text(L10n.shortcuts).font(.caption).foregroundColor(.secondary)
             }
             ShortcutRecordView(keyCombo: $keyCombo) { newKeyCombo in
@@ -447,8 +454,10 @@ struct ShortcutRecordView: NSViewRepresentable {
         func recordViewShouldBeginRecording(_ recordView: RecordView) -> Bool { true }
         func recordView(_ recordView: RecordView, canRecordKeyCombo keyCombo: KeyCombo) -> Bool { true }
         func recordView(_ recordView: RecordView, didChangeKeyCombo keyCombo: KeyCombo?) {
-            parent.keyCombo = keyCombo
-            parent.onKeyComboChange(keyCombo)
+            DispatchQueue.main.async {
+                self.parent.keyCombo = keyCombo
+                self.parent.onKeyComboChange(keyCombo)
+            }
         }
         func recordViewDidEndRecording(_ recordView: RecordView) {}
     }

@@ -85,7 +85,7 @@ final class DataService {
             let existingClip = clips[index]
             // If the data paths are different, delete the old data file
             if existingClip.dataPath != clip.dataPath {
-                CPYUtilities.deleteData(at: existingClip.dataPath)
+                CPYUtilities.deleteData(at: existingClip.fullDataPath)
             }
             clips.remove(at: index)
         }
@@ -99,7 +99,7 @@ final class DataService {
         if clips.count > maxSize {
             let clipsToRemove = clips.suffix(from: maxSize)
             clipsToRemove.forEach { clipToRemove in
-                CPYUtilities.deleteData(at: clipToRemove.dataPath)
+                CPYUtilities.deleteData(at: clipToRemove.fullDataPath)
                 if !clipToRemove.thumbnailPath.isEmpty {
                     ImageCacheService.shared.removeImage(forKey: clipToRemove.thumbnailPath)
                 }
@@ -112,14 +112,14 @@ final class DataService {
     func deleteClip(with dataHash: String) {
         if let index = clips.firstIndex(where: { $0.dataHash == dataHash }) {
             let clip = clips[index]
-            CPYUtilities.deleteData(at: clip.dataPath)
+            CPYUtilities.deleteData(at: clip.fullDataPath)
             clips.remove(at: index)
             saveClips()
         }
     }
 
     func clearAllClips() {
-        clips.forEach { CPYUtilities.deleteData(at: $0.dataPath) }
+        clips.forEach { CPYUtilities.deleteData(at: $0.fullDataPath) }
         clips.removeAll()
         saveClips()
     }

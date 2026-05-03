@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2015/06/21.
 //
@@ -55,6 +55,8 @@ final class CPYUtilities {
         defaultValues.updateValue(NSNumber(value: true), forKey: Constants.UserDefaults.overwriteSameHistory)
         defaultValues.updateValue(NSNumber(value: true), forKey: Constants.UserDefaults.copySameHistory)
         defaultValues.updateValue(NSNumber(value: true), forKey: Constants.UserDefaults.showColorPreviewInTheMenu)
+        defaultValues.updateValue(NSNumber(value: 0.75), forKey: Constants.UserDefaults.monitoringSpeed)
+        defaultValues.updateValue("System", forKey: Constants.UserDefaults.language)
 
         /* Updates */
         defaultValues.updateValue(NSNumber(value: true), forKey: Constants.Update.enableAutomaticCheck)

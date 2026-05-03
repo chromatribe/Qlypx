@@ -3,7 +3,7 @@
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
-//  HP: https://qlypx-app.com
+//  HP: https://chromatri.be
 //
 //  Created by Econa77 on 2015/06/21.
 //
@@ -81,9 +81,9 @@
 "Order after pasting" = "貼り付け後の履歴順序";
 "Move to top" = "最上部に移動";
 "Status bar icon" = "ステータスバーのアイコン";
-"Black" = "黒";
-"White" = "白";
-"Color" = "カラー";
+"Black" = "ソリッド";
+"White" = "ライン";
+"Color" = "アプリアイコン";
 "None" = "なし";
 "Send crash reports & error logs" = "クラッシュレポートとエラーログを送信する";
 "Number of items place inline" = "インライン表示する項目の数";
@@ -99,3 +99,25 @@
 "Height" = "高さ";
 "Select clipboard types to store:" = "保存するクリップボードの形式を選択：";
 "Exclude these applications:" = "以下のアプリケーションを除外する：";
+
+"Monitoring Speed" = "クリップボード監視速度";
+"High Speed (0.2s)" = "高速（0.2s）";
+"Fast (0.5s)" = "速め（0.5s）";
+"Standard (0.75s)" = "基本（0.75s）";
+"Power Saving (1.0s)" = "省エネ（1.0s）";
+
+"Language" = "言語設定";
+"System Language" = "システムの言語";
+"Japanese" = "日本語";
+"English" = "英語";
+"German" = "ドイツ語";
+"Italian" = "イタリア語";
+"Simplified Chinese" = "中国語 (簡体字)";
+
+"Plain Text" = "テキスト";
+"Rich Text Format (RTF)" = "リッチテキスト (RTF)";
+"Rich Text Format Directory (RTFD)" = "リッチテキスト (RTFD)";
+"PDF" = "PDF";
+"Filenames" = "ファイルパス";
+"URL" = "URL";
+"TIFF Image" = "画像 (TIFF)";

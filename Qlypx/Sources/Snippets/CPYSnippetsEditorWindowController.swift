@@ -68,7 +68,14 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
 
         var identifier: NSToolbarItem.Identifier { NSToolbarItem.Identifier(self.rawValue) }
         var title: String {
-            return NSLocalizedString(self.rawValue, comment: "")
+            switch self {
+            case .addFolder: return L10n.addFolder
+            case .addSnippet: return L10n.addSnippet
+            case .delete: return L10n.delete
+            case .changeStatus: return L10n.enableDisable
+            case .importCSV: return L10n.importCsv
+            case .exportCSV: return L10n.exportCsv
+            }
         }
         var symbol: String {
             switch self {

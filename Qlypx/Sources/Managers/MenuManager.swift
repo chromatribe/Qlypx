@@ -319,12 +319,12 @@ private extension MenuManager {
             menuItem.toolTip = (clipString as NSString).substring(to: toIndex)
         }
 
-        if primaryPboardType == .deprecatedTIFF {
-            menuItem.title = menuItemTitle("(Image)", listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
-        } else if primaryPboardType == .deprecatedPDF {
-            menuItem.title = menuItemTitle("(PDF)", listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
-        } else if primaryPboardType == .deprecatedFilenames && title.isEmpty {
-            menuItem.title = menuItemTitle("(Filenames)", listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
+        if primaryPboardType.isImage {
+            menuItem.title = menuItemTitle(L10n.image, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
+        } else if primaryPboardType.isPDF {
+            menuItem.title = menuItemTitle(L10n.pdf, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
+        } else if primaryPboardType.isFileURL && title.isEmpty {
+            menuItem.title = menuItemTitle(L10n.filenames, listNumber: listNumber, isMarkWithNumber: isMarkWithNumber)
         }
 
         if !clip.thumbnailPath.isEmpty && !clip.isColorCode && isShowImage {

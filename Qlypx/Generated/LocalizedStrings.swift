@@ -58,6 +58,30 @@ internal enum L10n {
   internal static let updates = L10n.tr("Localizable", "Updates")
   /// You can change this setting in the Preferences if you want.
   internal static let youCanChangeThisSettingInThePreferencesIfYouWant = L10n.tr("Localizable", "You can change this setting in the Preferences if you want")
+  /// Add Folder
+  internal static let addFolder = L10n.tr("Localizable", "Add Folder")
+  /// Add Snippet
+  internal static let addSnippet = L10n.tr("Localizable", "Add Snippet")
+  /// Delete
+  internal static let delete = L10n.tr("Localizable", "Delete")
+  /// Enable/Disable
+  internal static let enableDisable = L10n.tr("Localizable", "Enable/Disable")
+  /// Import CSV
+  internal static let importCsv = L10n.tr("Localizable", "Import CSV")
+  /// Export CSV
+  internal static let exportCsv = L10n.tr("Localizable", "Export CSV")
+  /// Image
+  internal static let image = L10n.tr("Localizable", "Image")
+  /// PDF
+  internal static let pdf = L10n.tr("Localizable", "PDF")
+  /// Filenames
+  internal static let filenames = L10n.tr("Localizable", "Filenames")
+  /// Exclude
+  internal static let exclude = L10n.tr("Localizable", "Exclude")
+  /// untitled folder
+  internal static let untitledFolder = L10n.tr("Localizable", "Untitled Folder")
+  /// untitled snippet
+  internal static let untitledSnippet = L10n.tr("Localizable", "Untitled Snippet")
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:enable nesting type_body_length type_name vertical_whitespace_opening_braces

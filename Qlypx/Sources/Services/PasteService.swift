@@ -27,33 +27,48 @@ extension PasteService {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
-        // 1. If we have an image, use writeObjects for the best compatibility
+        // 1. Handle objects (Images and File URLs)
+        var objectsToWriter = [NSPasteboardWriting]()
         if let image = data.image {
-            pasteboard.writeObjects([image])
+            objectsToWriter.append(image)
+        }
+        if !data.fileURLs.isEmpty {
+            data.fileURLs.forEach { objectsToWriter.append($0 as NSURL) }
+        }
+
+        if !objectsToWriter.isEmpty {
+            pasteboard.writeObjects(objectsToWriter)
         }
 
         // 2. Set other types as well
         let types = data.types
         types.forEach { type in
             switch type {
-            case .deprecatedString:
-                pasteboard.setString(data.stringValue, forType: .deprecatedString)
-            case .deprecatedRTFD:
-                if let rtfData = data.RTFData {
-                    pasteboard.setData(rtfData, forType: .deprecatedRTFD)
+            case NSPasteboard.PasteboardType.string, NSPasteboard.PasteboardType.legacyString:
+                if pasteboard.string(forType: .string) == nil {
+                    pasteboard.setString(data.stringValue, forType: .string)
                 }
-            case .deprecatedRTF:
-                if let rtfData = data.RTFData {
-                    pasteboard.setData(rtfData, forType: .deprecatedRTF)
+            case NSPasteboard.PasteboardType.rtfd, NSPasteboard.PasteboardType.legacyRTFD:
+                if let rtfData = data.RTFData, pasteboard.data(forType: .rtfd) == nil {
+                    pasteboard.setData(rtfData, forType: .rtfd)
                 }
-            case .deprecatedPDF:
-                if let pdfData = data.PDF, let pdfRep = NSPDFImageRep(data: pdfData) {
-                    pasteboard.setData(pdfRep.pdfRepresentation, forType: .deprecatedPDF)
+            case NSPasteboard.PasteboardType.rtf, NSPasteboard.PasteboardType.legacyRTF:
+                if let rtfData = data.RTFData, pasteboard.data(forType: .rtf) == nil {
+                    pasteboard.setData(rtfData, forType: .rtf)
                 }
-            case .deprecatedFilenames:
-                pasteboard.setPropertyList(data.fileNames, forType: .deprecatedFilenames)
-            case .deprecatedURL:
-                pasteboard.setPropertyList(data.URLs, forType: .deprecatedURL)
+            case NSPasteboard.PasteboardType.pdf, NSPasteboard.PasteboardType.legacyPDF:
+                if let pdfData = data.PDF, pasteboard.data(forType: .pdf) == nil {
+                    // Directly write PDF data for best compatibility
+                    pasteboard.setData(pdfData, forType: .pdf)
+                }
+            case NSPasteboard.PasteboardType.legacyFilenames:
+                if pasteboard.propertyList(forType: .legacyFilenames) == nil {
+                    pasteboard.setPropertyList(data.fileNames, forType: .legacyFilenames)
+                }
+            case NSPasteboard.PasteboardType.URL, NSPasteboard.PasteboardType.legacyURL:
+                if pasteboard.propertyList(forType: .URL) == nil {
+                    pasteboard.setPropertyList(data.URLs, forType: .URL)
+                }
             default:
                 break
             }
@@ -64,8 +79,8 @@ extension PasteService {
         lock.lock(); defer { lock.unlock() }
 
         let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.deprecatedString], owner: nil)
-        pasteboard.setString(string, forType: .deprecatedString)
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.setString(string, forType: .string)
     }
 
     func paste(with clip: CPYClip) {

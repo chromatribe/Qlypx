@@ -37,7 +37,13 @@ final class CPYPreferencesWindowController: NSWindowController {
         }
 
         var title: String {
-            self.rawValue // Can be localized later
+            switch self {
+            case .general: return L10n.general
+            case .menu: return L10n.menu
+            case .type: return L10n.type
+            case .exclude: return L10n.exclude
+            case .shortcuts: return L10n.shortcuts
+            }
         }
 
         var symbol: String {

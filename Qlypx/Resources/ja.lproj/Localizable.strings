@@ -64,3 +64,11 @@
 "Enable/Disable" = "有効/無効の切り替え";
 "Import CSV" = "CSVインポート";
 "Export CSV" = "CSVエクスポート";
+
+"Image" = "(画像)";
+"PDF" = "(PDFファイル)";
+"Filenames" = "(ファイルパス)";
+"Exclude" = "除外アプリ";
+
+"Untitled Folder" = "無題のフォルダ";
+"Untitled Snippet" = "無題のスニペット";

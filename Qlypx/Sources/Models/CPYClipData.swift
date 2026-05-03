@@ -20,11 +20,13 @@ final class CPYClipData: NSObject, NSCoding {
     fileprivate let kRTFDataKey     = "RTFData"
     fileprivate let kPDFKey         = "PDF"
     fileprivate let kFileNamesKey   = "filenames"
+    fileprivate let kFileURLsKey    = "fileURLs"
     fileprivate let kURLsKey        = "URL"
     fileprivate let kImageKey       = "image"
 
     var types          = [NSPasteboard.PasteboardType]()
     var fileNames      = [String]()
+    var fileURLs       = [URL]()
     var URLs           = [String]()
     var stringValue    = ""
     var RTFData: Data?
@@ -32,40 +34,46 @@ final class CPYClipData: NSObject, NSCoding {
     var image: NSImage?
 
     override var hash: Int {
-        var hash = types.map { $0.rawValue }.joined().hash
+        var hasher = Hasher()
+        types.forEach { hasher.combine($0.rawValue) }
         if let image = self.image, let imageData = image.tiffRepresentation {
-            hash ^= imageData.count
+            hasher.combine(imageData.count)
         } else if let image = self.image {
-            hash ^= image.hash
+            hasher.combine(image.hash)
         }
-        if !fileNames.isEmpty {
-            fileNames.forEach { hash ^= $0.hash }
+        if !fileURLs.isEmpty {
+            fileURLs.forEach { hasher.combine($0) }
+        } else if !fileNames.isEmpty {
+            fileNames.forEach { hasher.combine($0) }
         } else if !self.URLs.isEmpty {
-            URLs.forEach { hash ^= $0.hash }
+            URLs.forEach { hasher.combine($0) }
         } else if let pdf = PDF {
-            hash ^= pdf.count
+            hasher.combine(pdf.count)
         } else if !stringValue.isEmpty {
-            hash ^= stringValue.hash
+            hasher.combine(stringValue)
         }
         if let data = RTFData {
-            hash ^= data.count
+            hasher.combine(data.count)
         }
-        return hash
+        return hasher.finalize()
     }
     var primaryType: NSPasteboard.PasteboardType? {
         return types.first
     }
     var isOnlyStringType: Bool {
-        return types == [.deprecatedString]
+        return types == [.string] || types == [NSPasteboard.PasteboardType.legacyString]
     }
     var thumbnailImage: NSImage? {
         let defaults = UserDefaults.standard
         let width = defaults.integer(forKey: Constants.UserDefaults.thumbnailWidth)
         let height = defaults.integer(forKey: Constants.UserDefaults.thumbnailHeight)
 
-        if let image = image, fileNames.isEmpty {
+        if let image = image, fileURLs.isEmpty && fileNames.isEmpty {
             // Image only data
             return image.resizeImage(CGFloat(width), CGFloat(height))
+        } else if let fileURL = fileURLs.first {
+             // Handle via URL
+             return NSImage(contentsOf: fileURL)?.resizeImage(CGFloat(width), CGFloat(height))
         } else if let fileName = fileNames.first, let path = fileName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed), let url = URL(string: path) {
              // In the case of the local file correct data is not included in the image variable
              // Judge the image from the path and create a thumbnail
@@ -83,17 +91,17 @@ final class CPYClipData: NSObject, NSCoding {
     }
 
     static var availableTypes: [NSPasteboard.PasteboardType] {
-        return [.deprecatedString,
-                .deprecatedRTF,
-                .deprecatedRTFD,
-                .deprecatedPDF,
-                .deprecatedFilenames,
-                .deprecatedURL,
-                .deprecatedTIFF,
-                .tiff,
-                .png,
-                NSPasteboard.PasteboardType("public.jpeg"),
-                NSPasteboard.PasteboardType("com.compuserve.gif")]
+        return [NSPasteboard.PasteboardType.string,
+                NSPasteboard.PasteboardType.rtf,
+                NSPasteboard.PasteboardType.rtfd,
+                NSPasteboard.PasteboardType.pdf,
+                NSPasteboard.PasteboardType.fileURL,
+                NSPasteboard.PasteboardType.legacyFilenames,
+                NSPasteboard.PasteboardType.URL,
+                NSPasteboard.PasteboardType.tiff,
+                NSPasteboard.PasteboardType.png,
+                NSPasteboard.PasteboardType.jpeg,
+                NSPasteboard.PasteboardType.gif]
     }
     static var availableTypesString: [String] {
         return ["String",
@@ -101,17 +109,26 @@ final class CPYClipData: NSObject, NSCoding {
                 "RTFD",
                 "PDF",
                 "Filenames",
+                "Filenames",
                 "URL",
+                "TIFF",
+                "TIFF",
+                "TIFF",
                 "TIFF"]
     }
     static var availableTypesDictinary: [NSPasteboard.PasteboardType: String] {
         var availableTypes = [NSPasteboard.PasteboardType: String]()
         zip(CPYClipData.availableTypes, CPYClipData.availableTypesString).forEach { availableTypes[$0] = $1 }
-        // Map modern types to existing "TIFF" setting
-        availableTypes[.tiff] = "TIFF"
-        availableTypes[.png] = "TIFF"
-        availableTypes[NSPasteboard.PasteboardType("public.jpeg")] = "TIFF"
-        availableTypes[NSPasteboard.PasteboardType("com.compuserve.gif")] = "TIFF"
+        
+        // Legacy mappings
+        availableTypes[.legacyString] = "String"
+        availableTypes[.legacyRTF] = "RTF"
+        availableTypes[.legacyRTFD] = "RTFD"
+        availableTypes[.legacyPDF] = "PDF"
+        availableTypes[.legacyFilenames] = "Filenames"
+        availableTypes[.legacyURL] = "URL"
+        availableTypes[.legacyTIFF] = "TIFF"
+        
         return availableTypes
     }
 
@@ -121,22 +138,37 @@ final class CPYClipData: NSObject, NSCoding {
         self.types = types
         types.forEach { type in
             switch type {
-            case .deprecatedString:
-                guard let string = pasteboard.string(forType: .deprecatedString) else { return }
-                stringValue = string
-            case .deprecatedRTFD:
-                RTFData = pasteboard.data(forType: .deprecatedRTFD)
-            case .deprecatedRTF where RTFData == nil:
-                RTFData = pasteboard.data(forType: .deprecatedRTF)
-            case .deprecatedPDF:
-                PDF = pasteboard.data(forType: .deprecatedPDF)
-            case .deprecatedFilenames:
-                guard let filenames = pasteboard.propertyList(forType: .deprecatedFilenames) as? [String] else { return }
-                self.fileNames = filenames
-            case .deprecatedURL:
-                guard let urls = pasteboard.propertyList(forType: .deprecatedURL) as? [String] else { return }
-                URLs = urls
-            case .deprecatedTIFF, .tiff, .png, NSPasteboard.PasteboardType("public.jpeg"), NSPasteboard.PasteboardType("com.compuserve.gif"):
+            case NSPasteboard.PasteboardType.string, NSPasteboard.PasteboardType.legacyString:
+                if stringValue.isEmpty, let string = pasteboard.string(forType: type) {
+                    stringValue = string
+                }
+            case NSPasteboard.PasteboardType.rtfd, NSPasteboard.PasteboardType.legacyRTFD:
+                if RTFData == nil {
+                    RTFData = pasteboard.data(forType: type)
+                }
+            case NSPasteboard.PasteboardType.rtf, NSPasteboard.PasteboardType.legacyRTF:
+                if RTFData == nil {
+                    RTFData = pasteboard.data(forType: type)
+                }
+            case NSPasteboard.PasteboardType.pdf, NSPasteboard.PasteboardType.legacyPDF:
+                if PDF == nil {
+                    PDF = pasteboard.data(forType: type)
+                }
+            case NSPasteboard.PasteboardType.fileURL:
+                if fileURLs.isEmpty {
+                    self.fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] ?? []
+                    // Also populate filenames for backward compatibility
+                    self.fileNames = fileURLs.map { $0.path }
+                }
+            case NSPasteboard.PasteboardType.legacyFilenames:
+                if fileNames.isEmpty, let filenames = pasteboard.propertyList(forType: NSPasteboard.PasteboardType.legacyFilenames) as? [String] {
+                    self.fileNames = filenames
+                }
+            case NSPasteboard.PasteboardType.URL, NSPasteboard.PasteboardType.legacyURL:
+                if URLs.isEmpty, let urls = pasteboard.propertyList(forType: type) as? [String] {
+                    URLs = urls
+                }
+            case _ where type.isImage:
                 if image == nil {
                     image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage
                 }
@@ -146,7 +178,7 @@ final class CPYClipData: NSObject, NSCoding {
     }
 
     init(image: NSImage) {
-        self.types = [.deprecatedTIFF, .tiff, .png, NSPasteboard.PasteboardType("public.jpeg"), NSPasteboard.PasteboardType("com.compuserve.gif")]
+        self.types = [.tiff, .png, NSPasteboard.PasteboardType.jpeg, NSPasteboard.PasteboardType.gif]
         self.image = image
     }
 
@@ -163,6 +195,7 @@ final class CPYClipData: NSObject, NSCoding {
         aCoder.encode(RTFData, forKey: kRTFDataKey)
         aCoder.encode(PDF, forKey: kPDFKey)
         aCoder.encode(fileNames, forKey: kFileNamesKey)
+        aCoder.encode(fileURLs, forKey: kFileURLsKey)
         aCoder.encode(URLs, forKey: kURLsKey)
         aCoder.encode(image, forKey: kImageKey)
     }
@@ -170,6 +203,7 @@ final class CPYClipData: NSObject, NSCoding {
     required init?(coder aDecoder: NSCoder) {
         types = (aDecoder.decodeObject(forKey: kTypesKey) as? [String])?.compactMap { NSPasteboard.PasteboardType(rawValue: $0) } ?? []
         fileNames = aDecoder.decodeObject(forKey: kFileNamesKey) as? [String] ?? [String]()
+        fileURLs = aDecoder.decodeObject(forKey: kFileURLsKey) as? [URL] ?? [URL]()
         URLs = aDecoder.decodeObject(forKey: kURLsKey) as? [String] ?? [String]()
         stringValue = aDecoder.decodeObject(forKey: kStringValueKey) as? String ?? ""
         RTFData = aDecoder.decodeObject(forKey: kRTFDataKey) as? Data

@@ -179,6 +179,8 @@ extension AppDelegate: NSApplicationDelegate {
         // Environments
         AppEnvironment.replaceCurrent(environment: AppEnvironment.fromStorage())
         QlyLogger.debug("AppEnvironment replaced", log: .environment)
+        // Diagnostics
+        AppEnvironment.current.diagnosticService.setup()
         // UserDefaults
         CPYUtilities.registerUserDefaultKeys()
         // SDKs

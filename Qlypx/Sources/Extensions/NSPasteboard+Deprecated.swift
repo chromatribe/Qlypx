@@ -12,39 +12,32 @@
 
 import Cocoa
 
-/**
- *  The contents of PasteboardType has been changed with swift 4.
- *  However, we will use the swift 3 style to keep compatibility with existing items
- *  Help wanted - If there is a good implementation I would like to replace it.
- **/
 extension NSPasteboard.PasteboardType {
+    // Legacy support for existing saved items (Raw strings used in Clipy/Older Qlypx)
+    static let legacyString    = NSPasteboard.PasteboardType(rawValue: "NSStringPboardType")
+    static let legacyRTF       = NSPasteboard.PasteboardType(rawValue: "NSRTFPboardType")
+    static let legacyRTFD      = NSPasteboard.PasteboardType(rawValue: "NSRTFDPboardType")
+    static let legacyPDF       = NSPasteboard.PasteboardType(rawValue: "NSPDFPboardType")
+    static let legacyFilenames = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
+    static let legacyURL       = NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")
+    static let legacyTIFF      = NSPasteboard.PasteboardType(rawValue: "NSTIFFPboardType")
+    
+    // Modern Image Types (Some are not predefined in older SDKs or for convenience)
+    static let jpeg = NSPasteboard.PasteboardType("public.jpeg")
+    static let gif  = NSPasteboard.PasteboardType("com.compuserve.gif")
+}
 
-    static var deprecatedString: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSStringPboardType")
+extension NSPasteboard.PasteboardType {
+    /// Helper to identify if a type is an image
+    var isImage: Bool {
+        return self == .tiff || self == .png || self == .jpeg || self == .gif || self == .legacyTIFF
     }
 
-    static var deprecatedRTF: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSRTFPboardType")
+    var isPDF: Bool {
+        return self == .pdf || self == .legacyPDF
     }
 
-    static var deprecatedRTFD: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSRTFDPboardType")
+    var isFileURL: Bool {
+        return self == .fileURL || self == .legacyFilenames
     }
-
-    static var deprecatedPDF: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSPDFPboardType")
-    }
-
-    static var deprecatedFilenames: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
-    }
-
-    static var deprecatedURL: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSURLPboardType")
-    }
-
-    static var deprecatedTIFF: NSPasteboard.PasteboardType {
-        return NSPasteboard.PasteboardType(rawValue: "NSTIFFPboardType")
-    }
-
 }

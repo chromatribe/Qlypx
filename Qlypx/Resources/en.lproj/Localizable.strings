@@ -64,3 +64,11 @@
 "Enable/Disable" = "Enable/Disable";
 "Import CSV" = "Import CSV";
 "Export CSV" = "Export CSV";
+
+"Image" = "(Image)";
+"PDF" = "(PDF)";
+"Filenames" = "(Filenames)";
+"Exclude" = "Exclude";
+
+"Untitled Folder" = "untitled folder";
+"Untitled Snippet" = "untitled snippet";

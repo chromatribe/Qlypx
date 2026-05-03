@@ -44,6 +44,7 @@ struct AppEnvironment {
                      excludeAppService: ExcludeAppService = current.excludeAppService,
                      accessibilityService: AccessibilityService = current.accessibilityService,
                      updateService: UpdateService = current.updateService,
+                     diagnosticService: DiagnosticService = current.diagnosticService,
                      menuManager: MenuManager = current.menuManager,
                      defaults: UserDefaults = current.defaults) {
         push(environment: Environment(dataService: dataService,
@@ -54,6 +55,7 @@ struct AppEnvironment {
                                       excludeAppService: excludeAppService,
                                       accessibilityService: accessibilityService,
                                       updateService: updateService,
+                                      diagnosticService: diagnosticService,
                                       menuManager: menuManager,
                                       defaults: defaults))
     }
@@ -66,6 +68,7 @@ struct AppEnvironment {
                                excludeAppService: ExcludeAppService = current.excludeAppService,
                                accessibilityService: AccessibilityService = current.accessibilityService,
                                updateService: UpdateService = current.updateService,
+                               diagnosticService: DiagnosticService = current.diagnosticService,
                                menuManager: MenuManager = current.menuManager,
                                defaults: UserDefaults = current.defaults) {
         replaceCurrent(environment: Environment(dataService: dataService,
@@ -76,6 +79,7 @@ struct AppEnvironment {
                                                 excludeAppService: excludeAppService,
                                                 accessibilityService: accessibilityService,
                                                 updateService: updateService,
+                                                diagnosticService: diagnosticService,
                                                 menuManager: menuManager,
                                                 defaults: defaults))
     }
@@ -100,6 +104,7 @@ struct AppEnvironment {
                            excludeAppService: excludeAppService,
                            accessibilityService: current.accessibilityService,
                            updateService: current.updateService,
+                           diagnosticService: current.diagnosticService,
                            menuManager: current.menuManager,
                            defaults: current.defaults)
     }

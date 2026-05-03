@@ -23,6 +23,7 @@ struct Environment {
     let excludeAppService: ExcludeAppService
     let accessibilityService: AccessibilityService
     let updateService: UpdateService
+    let diagnosticService: DiagnosticService
     let menuManager: MenuManager
 
     let defaults: UserDefaults
@@ -36,6 +37,7 @@ struct Environment {
          excludeAppService: ExcludeAppService = ExcludeAppService(applications: []),
          accessibilityService: AccessibilityService = AccessibilityService(),
          updateService: UpdateService = UpdateService(),
+         diagnosticService: DiagnosticService = DiagnosticService.shared,
          menuManager: MenuManager = MenuManager(),
          defaults: UserDefaults = .standard) {
 
@@ -47,6 +49,7 @@ struct Environment {
         self.excludeAppService = excludeAppService
         self.accessibilityService = accessibilityService
         self.updateService = updateService
+        self.diagnosticService = diagnosticService
         self.menuManager = menuManager
         self.defaults = defaults
     }

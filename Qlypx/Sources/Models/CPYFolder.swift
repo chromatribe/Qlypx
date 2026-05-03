@@ -48,7 +48,7 @@ extension CPYFolder {
 extension CPYFolder {
     static func create() -> CPYFolder {
         let folder = CPYFolder()
-        folder.title = "untitled folder"
+        folder.title = L10n.untitledFolder
         let lastFolder = AppEnvironment.current.dataService.folders.sorted(by: { $0.index < $1.index }).last
         folder.index = (lastFolder?.index ?? -1) + 1
         return folder
@@ -64,7 +64,7 @@ extension CPYFolder {
 
     func createSnippet() -> CPYSnippet {
         let snippet = CPYSnippet()
-        snippet.title = "untitled snippet"
+        snippet.title = L10n.untitledSnippet
         snippet.index = snippets.count
         return snippet
     }

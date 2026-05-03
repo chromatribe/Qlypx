@@ -3,7 +3,7 @@
 > **このファイルがプロジェクトの唯一の真実（Single Source of Truth）です。**
 > `GEMINI.md` はこのファイルへの入口として短く保ちます。
 
-**Current Version:** `1.20260503.8`
+**Current Version:** `1.20260503.9`
 
 ---
 
@@ -270,6 +270,10 @@ if type.isImage { ... }
 - **Feature**: 重複コピー時に「上書きして先頭に移動」する挙動を標準化。
 - **UI**: 設定パネルから冗長な項目（Cmd+V自動入力、数字キーショートカット、0開始設定等）を削除し、レイアウトを最適化。
 - **Logic**: `DataService` と `ClipService` の重複処理ロジックを統合・簡略化。
+
+### 1.20260503.9
+- **Security**: Slack へのエラー通知を中継サーバー（Google Cloud Run）経由に刷新。アプリから Webhook URL を完全に排除し、安全性を向上。
+- **Modernization**: `DiagnosticServer` を Cloud Run へデプロイし、サーバーレスでのエラー収集体制を確立。
 
 ### 1.20260503.8
 - **Modernization**: スニペットエディタを完全に SwiftUI 移行。`NavigationSplitView` によるモダンな 2 ペインレイアウトを採用。

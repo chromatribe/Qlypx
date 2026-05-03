@@ -19,8 +19,10 @@ app.post('/report', async (req, res) => {
     if (WEBHOOK_URL) {
         try {
             // Forwarding to Discord/Slack
+            const message = `🚨 *New Qlypx Diagnostic Report*\n*Version:* ${version}\n*OS:* ${os}\n*Timestamp:* ${timestamp}\n\n\`\`\`\n${content.substring(0, 1500)}\n\`\`\``;
             await axios.post(WEBHOOK_URL, {
-                content: `🚨 **New Qlypx Diagnostic Report**\n**Version:** ${version}\n**OS:** ${os}\n**Timestamp:** ${timestamp}\n\n\`\`\`\n${content.substring(0, 1500)}\n\`\`\``
+                text: message,      // For Slack
+                content: message    // For Discord
             });
             console.log('Successfully forwarded to Webhook');
         } catch (error) {

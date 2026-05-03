@@ -109,16 +109,12 @@ extension ClipService {
 
     fileprivate func save(with data: CPYClipData) {
         let dataService = AppEnvironment.current.dataService
-        // Copy already copied history
-        let isCopySameHistory = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.copySameHistory)
-        if dataService.clips.contains(where: { $0.dataHash == "\(data.hash)" }), !isCopySameHistory { return }
 
         // Don't save empty string history
         if data.isOnlyStringType && data.stringValue.isEmpty { return }
 
-        // Overwrite same history
-        let isOverwriteHistory = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.overwriteSameHistory)
-        let savedHash = (isOverwriteHistory) ? data.hash : Int(arc4random() % 1000000)
+        // Use data hash to ensure duplicates are handled by upsert (moving to top)
+        let savedHash = data.hash
 
         // Saved time and path
         let unixTime = Int(Date().timeIntervalSince1970)

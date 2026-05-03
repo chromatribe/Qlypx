@@ -68,10 +68,14 @@ final class DataService {
     // MARK: - Clips Actions
     func upsertClip(_ clip: CPYClip) {
         if let index = clips.firstIndex(where: { $0.dataHash == clip.dataHash }) {
-            clips[index] = clip
-        } else {
-            clips.insert(clip, at: 0)
+            let existingClip = clips[index]
+            // If the data paths are different, delete the old data file
+            if existingClip.dataPath != clip.dataPath {
+                CPYUtilities.deleteData(at: existingClip.dataPath)
+            }
+            clips.remove(at: index)
         }
+        clips.insert(clip, at: 0)
         // Limit history size
         let maxSize = AppEnvironment.current.defaults.integer(forKey: Constants.UserDefaults.maxHistorySize)
         if clips.count > maxSize {

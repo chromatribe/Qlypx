@@ -10,114 +10,114 @@
 //  Copyright © 2015-2018 Qlypx Project.
 //
 
-"Launch Qlypx on system startup?" = "Launch Qlypx on system startup?";
+"Launch Qlypx on system startup?" = "Avviare Qlypx all'avvio del sistema?";
 
-"You can change this setting in the Preferences if you want" = "You can change this setting in the Preferences if you want.";
+"You can change this setting in the Preferences if you want" = "Puoi cambiare questa impostazione nelle preferenze se lo desideri.";
 
-"Launch on system startup" = "Launch on system startup";
+"Launch on system startup" = "Avvia all'avvio del sistema";
 
-"Don't Launch" = "Don't Launch";
+"Don't Launch" = "Non avviare";
 
-"Clear History" = "Clear History";
+"Clear History" = "Cancella cronologia";
 
-"Are you sure you want to clear your clipboard history?" = "Are you sure you want to clear your clipboard history?";
+"Are you sure you want to clear your clipboard history?" = "Sei sicuro di voler cancellare la cronologia degli appunti?";
 
-"Cancel" = "Cancel";
+"Cancel" = "Annulla";
 
-"Edit Snippets" = "Edit Snippets...";
+"Edit Snippets" = "Modifica snippet...";
 
-"Preferences" = "Preferences...";
+"Preferences" = "Preferenze...";
 
-"Quit Qlypx" = "Quit Qlypx";
+"Quit Qlypx" = "Esci da Qlypx";
 
-"History" = "History";
+"History" = "Cronologia";
 
 "Snippet" = "Snippet";
 
-"General" = "General";
+"General" = "Generale";
 
 "Menu" = "Menu";
 
-"Type" = "Type";
+"Type" = "Tipo";
 
-"Shortcuts" = "Shortcuts";
-"Others" = "Others";
-"Menu Items" = "Menu Items";
-"Appearance" = "Appearance";
+"Shortcuts" = "Scorciatoie";
+"Others" = "Altro";
+"Menu Items" = "Elementi del menu";
+"Appearance" = "Aspetto";
 
-"Updates" = "Updates";
+"Updates" = "Aggiornamenti";
 
-"Delete Item" = "Delete Item";
+"Delete Item" = "Elimina elemento";
 
-"Are you sure want to delete this item?" = "Are you sure want to delete this item?";
+"Are you sure want to delete this item?" = "Sei sicuro di voler eliminare questo elemento?";
 
-"Add" = "Add";
+"Add" = "Aggiungi";
 
-"Please fill in the contents of the snippet" = "Please fill in the contents of the snippet";
+"Please fill in the contents of the snippet" = "Inserisci il contenuto dello snippet.";
 
-"Please allow Accessibility" = "Please allow Accessibility.";
+"Please allow Accessibility" = "Consenti l'accessibilità.";
 
-"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "To do this action please allow Accessibility in Security & Privacy preferences, located in System Preferences.";
+"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "Per eseguire questa azione, consenti l'accessibilità nelle Preferenze di Sistema.";
 
-"Open System Preferences" = "Open System Preferences";
+"Open System Preferences" = "Apri Preferenze di Sistema";
 
-"Add Folder" = "Add Folder";
-"Add Snippet" = "Add Snippet";
-"Delete" = "Delete";
-"Enable/Disable" = "Enable/Disable";
-"Import CSV" = "Import CSV";
-"Export CSV" = "Export CSV";
+"Add Folder" = "Aggiungi cartella";
+"Add Snippet" = "Aggiungi snippet";
+"Delete" = "Elimina";
+"Enable/Disable" = "Abilita/Disabilita";
+"Import CSV" = "Importa CSV";
+"Export CSV" = "Esporta CSV";
 
-"Image" = "(Image)";
-"PDF" = "(PDF)";
-"Filenames" = "(Filenames)";
-"Exclude" = "Exclude";
+"Image" = "Immagine";
+"PDF" = "PDF";
+"Filenames" = "Nomi file";
+"Exclude" = "Escludi";
 
-"Untitled Folder" = "untitled folder";
-"Untitled Snippet" = "untitled snippet";
+"Untitled Folder" = "Cartella senza titolo";
+"Untitled Snippet" = "Snippet senza titolo";
 
 // Preferences
-"Remember history size" = "Remember history size";
-"Order after pasting" = "Order after pasting";
-"Move to top" = "Move to top";
-"Status bar icon" = "Status bar icon";
-"Black" = "Solid";
-"White" = "Line";
-"Color" = "App Icon";
-"None" = "None";
-"Send crash reports & error logs" = "Send crash reports & error logs";
-"Number of items place inline" = "Number of items place inline";
-"Number of items inside a folder" = "Number of items inside a folder";
-"Max characters in the menu" = "Max characters in the menu";
-"Mark menu items with numbers" = "Mark menu items with numbers";
-"Display icons in menu items" = "Display icons in menu items";
-"Show tool tip on a menu item" = "Show tool tip on a menu item";
-"Max length of tool tip" = "Max length of tool tip";
-"Show color code preview" = "Show color code preview";
-"Show Image" = "Show Image";
-"Width" = "Width";
-"Height" = "Height";
-"Select clipboard types to store:" = "Select clipboard types to store:";
-"Exclude these applications:" = "Exclude these applications:";
+"Remember history size" = "Dimensione cronologia";
+"Order after pasting" = "Ordine dopo l'incollo";
+"Move to top" = "Sposta in alto";
+"Status bar icon" = "Icona barra di stato";
+"Black" = "Pieno";
+"White" = "Linea";
+"Color" = "Icona App";
+"None" = "Nessuno";
+"Send crash reports & error logs" = "Invia rapporti crash e log errori";
+"Number of items place inline" = "Elementi in linea";
+"Number of items inside a folder" = "Elementi in una cartella";
+"Max characters in the menu" = "Caratteri massimi nel menu";
+"Mark menu items with numbers" = "Contrassegna con numeri";
+"Display icons in menu items" = "Mostra icone nel menu";
+"Show tool tip on a menu item" = "Mostra tooltip";
+"Max length of tool tip" = "Lunghezza massima tooltip";
+"Show color code preview" = "Anteprima codice colore";
+"Show Image" = "Mostra immagine";
+"Width" = "Larghezza";
+"Height" = "Altezza";
+"Select clipboard types to store:" = "Tipi di appunti da salvare:";
+"Exclude these applications:" = "Escludi queste applicazioni:";
 
-"Monitoring Speed" = "Clipboard Monitoring Speed";
-"High Speed (0.2s)" = "High Speed (0.2s)";
-"Fast (0.5s)" = "Fast (0.5s)";
+"Monitoring Speed" = "Velocità di monitoraggio";
+"High Speed (0.2s)" = "Alta velocità (0.2s)";
+"Fast (0.5s)" = "Veloce (0.5s)";
 "Standard (0.75s)" = "Standard (0.75s)";
-"Power Saving (1.0s)" = "Power Saving (1.0s)";
+"Power Saving (1.0s)" = "Risparmio energetico (1.0s)";
 
-"Language" = "Language";
-"System Language" = "System Language";
-"Japanese" = "Japanese";
-"English" = "English";
-"German" = "German";
-"Italian" = "Italian";
-"Simplified Chinese" = "Simplified Chinese";
+"Language" = "Lingua";
+"System Language" = "Lingua di sistema";
+"Japanese" = "Giapponese";
+"English" = "Inglese";
+"German" = "Tedesco";
+"Italian" = "Italiano";
+"Simplified Chinese" = "Cinese semplificato";
 
-"Plain Text" = "Plain Text";
+"Plain Text" = "Testo semplice";
 "Rich Text Format (RTF)" = "Rich Text Format (RTF)";
-"Rich Text Format Directory (RTFD)" = "Rich Text Format Directory (RTFD)";
+"Rich Text Format Directory (RTFD)" = "Rich Text Directory (RTFD)";
 "PDF" = "PDF";
-"Filenames" = "Filenames";
+"Filenames" = "Nomi file";
 "URL" = "URL";
-"TIFF Image" = "TIFF Image";
+"TIFF Image" = "Immagine TIFF";

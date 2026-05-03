@@ -10,21 +10,21 @@
 //  Copyright © 2015-2018 Qlypx Project.
 //
 
-"Launch Qlypx on system startup?" = "Launch Qlypx on system startup?";
+"Launch Qlypx on system startup?" = "Qlypx beim Systemstart starten?";
 
-"You can change this setting in the Preferences if you want" = "You can change this setting in the Preferences if you want.";
+"You can change this setting in the Preferences if you want" = "Sie können diese Einstellung in den Einstellungen ändern.";
 
-"Launch on system startup" = "Launch on system startup";
+"Launch on system startup" = "Beim Systemstart starten";
 
-"Don't Launch" = "Don't Launch";
+"Don't Launch" = "Nicht starten";
 
-"Clear History" = "Clear History";
+"Clear History" = "Verlauf löschen";
 
-"Are you sure you want to clear your clipboard history?" = "Are you sure you want to clear your clipboard history?";
+"Are you sure you want to clear your clipboard history?" = "Sind Sie sicher, dass Sie den Verlauf löschen möchten?";
 
-"Cancel" = "Cancel";
+"Cancel" = "Abbrechen";
 
-"Edit Snippets" = "Edit Snippets...";
+"Edit Snippets" = "Snippets bearbeiten...";
 
 "Preferences" = "Einstellungen...";
 
@@ -47,64 +47,64 @@
 
 "Updates" = "Updates";
 
-"Delete Item" = "Delete Item";
+"Delete Item" = "Element löschen";
 
-"Are you sure want to delete this item?" = "Are you sure want to delete this item?";
+"Are you sure want to delete this item?" = "Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?";
 
-"Add" = "Add";
+"Add" = "Hinzufügen";
 
-"Please fill in the contents of the snippet" = "Please fill in the contents of the snippet";
+"Please fill in the contents of the snippet" = "Bitte füllen Sie den Inhalt des Snippets aus.";
 
-"Please allow Accessibility" = "Please allow Accessibility.";
+"Please allow Accessibility" = "Bitte erlauben Sie die Bedienungshilfen.";
 
-"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "To do this action please allow Accessibility in Security & Privacy preferences, located in System Preferences.";
+"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "Um dies zu tun, erlauben Sie bitte die Bedienungshilfen in den Systemeinstellungen.";
 
-"Open System Preferences" = "Open System Preferences";
+"Open System Preferences" = "Systemeinstellungen öffnen";
 
-"Add Folder" = "Add Folder";
-"Add Snippet" = "Add Snippet";
-"Delete" = "Delete";
-"Enable/Disable" = "Enable/Disable";
-"Import CSV" = "Import CSV";
-"Export CSV" = "Export CSV";
+"Add Folder" = "Ordner hinzufügen";
+"Add Snippet" = "Snippet hinzufügen";
+"Delete" = "Löschen";
+"Enable/Disable" = "Aktivieren/Deaktivieren";
+"Import CSV" = "CSV importieren";
+"Export CSV" = "CSV exportieren";
 
-"Image" = "(Image)";
-"PDF" = "(PDF)";
-"Filenames" = "(Filenames)";
-"Exclude" = "Exclude";
+"Image" = "Bild";
+"PDF" = "PDF";
+"Filenames" = "Dateinamen";
+"Exclude" = "Ausschließen";
 
-"Untitled Folder" = "untitled folder";
-"Untitled Snippet" = "untitled snippet";
+"Untitled Folder" = "Unbenannter Ordner";
+"Untitled Snippet" = "Unbenanntes Snippet";
 
 // Preferences
-"Remember history size" = "Remember history size";
-"Order after pasting" = "Order after pasting";
-"Move to top" = "Move to top";
-"Status bar icon" = "Status bar icon";
+"Remember history size" = "Verlaufsgrenze";
+"Order after pasting" = "Reihenfolge nach dem Einfügen";
+"Move to top" = "Nach oben verschieben";
+"Status bar icon" = "Statusleistensymbol";
 "Black" = "Solid";
-"White" = "Line";
-"Color" = "App Icon";
-"None" = "None";
-"Send crash reports & error logs" = "Send crash reports & error logs";
-"Number of items place inline" = "Number of items place inline";
-"Number of items inside a folder" = "Number of items inside a folder";
-"Max characters in the menu" = "Max characters in the menu";
-"Mark menu items with numbers" = "Mark menu items with numbers";
-"Display icons in menu items" = "Display icons in menu items";
-"Show tool tip on a menu item" = "Show tool tip on a menu item";
-"Max length of tool tip" = "Max length of tool tip";
-"Show color code preview" = "Show color code preview";
-"Show Image" = "Show Image";
-"Width" = "Width";
-"Height" = "Height";
-"Select clipboard types to store:" = "Select clipboard types to store:";
-"Exclude these applications:" = "Exclude these applications:";
+"White" = "Linie";
+"Color" = "App-Symbol";
+"None" = "Keine";
+"Send crash reports & error logs" = "Crashberichte & Fehlerprotokolle senden";
+"Number of items place inline" = "Anzahl der Inline-Elemente";
+"Number of items inside a folder" = "Anzahl der Elemente im Ordner";
+"Max characters in the menu" = "Maximale Zeichen im Menü";
+"Mark menu items with numbers" = "Menüeinträge mit Nummern markieren";
+"Display icons in menu items" = "Icons in Menüeinträgen anzeigen";
+"Show tool tip on a menu item" = "Tooltip für Menüeinträge anzeigen";
+"Max length of tool tip" = "Maximale Länge des Tooltips";
+"Show color code preview" = "Farbcode-Vorschau anzeigen";
+"Show Image" = "Bild anzeigen";
+"Width" = "Breite";
+"Height" = "Höhe";
+"Select clipboard types to store:" = "Zu speichernde Formate auswählen:";
+"Exclude these applications:" = "Diese Anwendungen ausschließen:";
 
-"Monitoring Speed" = "Clipboard Monitoring Speed";
-"High Speed (0.2s)" = "High Speed (0.2s)";
-"Fast (0.5s)" = "Fast (0.5s)";
+"Monitoring Speed" = "Überwachungsgeschwindigkeit";
+"High Speed (0.2s)" = "Hochgeschwindigkeit (0.2s)";
+"Fast (0.5s)" = "Schnell (0.5s)";
 "Standard (0.75s)" = "Standard (0.75s)";
-"Power Saving (1.0s)" = "Power Saving (1.0s)";
+"Power Saving (1.0s)" = "Energiesparend (1.0s)";
 
 "Language" = "Sprache";
 "System Language" = "Systemsprache";
@@ -114,10 +114,10 @@
 "Italian" = "Italienisch";
 "Simplified Chinese" = "Chinesisch (Vereinfacht)";
 
-"Plain Text" = "Plain Text";
-"Rich Text Format (RTF)" = "Rich Text Format (RTF)";
-"Rich Text Format Directory (RTFD)" = "Rich Text Format Directory (RTFD)";
+"Plain Text" = "Klartext";
+"Rich Text Format (RTF)" = "Rich-Text-Format (RTF)";
+"Rich Text Format Directory (RTFD)" = "Rich-Text-Verzeichnis (RTFD)";
 "PDF" = "PDF";
-"Filenames" = "Filenames";
+"Filenames" = "Dateinamen";
 "URL" = "URL";
-"TIFF Image" = "TIFF Image";
+"TIFF Image" = "TIFF-Bild";

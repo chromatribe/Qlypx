@@ -53,7 +53,7 @@
 
 "Add" = "Add";
 
-"Please fill in the contents of the snippet" = "Please fill in the contents of the snippet";
+"Please fill in the contents of the snippet" = "Please fill in the contents of the snippet.";
 
 "Please allow Accessibility" = "Please allow Accessibility.";
 
@@ -68,13 +68,13 @@
 "Import CSV" = "Import CSV";
 "Export CSV" = "Export CSV";
 
-"Image" = "(Image)";
-"PDF" = "(PDF)";
-"Filenames" = "(Filenames)";
+"Image" = "Image";
+"PDF" = "PDF";
+"Filenames" = "Filenames";
 "Exclude" = "Exclude";
 
-"Untitled Folder" = "untitled folder";
-"Untitled Snippet" = "untitled snippet";
+"Untitled Folder" = "Untitled Folder";
+"Untitled Snippet" = "Untitled Snippet";
 
 // Preferences
 "Remember history size" = "Remember history size";
@@ -100,7 +100,7 @@
 "Select clipboard types to store:" = "Select clipboard types to store:";
 "Exclude these applications:" = "Exclude these applications:";
 
-"Monitoring Speed" = "Clipboard Monitoring Speed";
+"Monitoring Speed" = "Monitoring Speed";
 "High Speed (0.2s)" = "High Speed (0.2s)";
 "Fast (0.5s)" = "Fast (0.5s)";
 "Standard (0.75s)" = "Standard (0.75s)";

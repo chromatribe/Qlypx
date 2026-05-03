@@ -10,21 +10,21 @@
 //  Copyright © 2015-2018 Qlypx Project.
 //
 
-"Launch Qlypx on system startup?" = "Launch Qlypx on system startup?";
+"Launch Qlypx on system startup?" = "要在系统启动时启动 Qlypx 吗？";
 
-"You can change this setting in the Preferences if you want" = "You can change this setting in the Preferences if you want.";
+"You can change this setting in the Preferences if you want" = "您可以根据需要在首选项中更改此设置。";
 
-"Launch on system startup" = "Launch on system startup";
+"Launch on system startup" = "系统启动时启动";
 
-"Don't Launch" = "Don't Launch";
+"Don't Launch" = "不启动";
 
-"Clear History" = "Clear History";
+"Clear History" = "清除历史记录";
 
-"Are you sure you want to clear your clipboard history?" = "Are you sure you want to clear your clipboard history?";
+"Are you sure you want to clear your clipboard history?" = "您确定要清除剪贴板历史记录吗？";
 
-"Cancel" = "Cancel";
+"Cancel" = "取消";
 
-"Edit Snippets" = "Edit Snippets...";
+"Edit Snippets" = "编辑片段...";
 
 "Preferences" = "首选项...";
 
@@ -47,64 +47,64 @@
 
 "Updates" = "更新";
 
-"Delete Item" = "Delete Item";
+"Delete Item" = "删除项目";
 
-"Are you sure want to delete this item?" = "Are you sure want to delete this item?";
+"Are you sure want to delete this item?" = "您确定要删除此项目吗？";
 
-"Add" = "Add";
+"Add" = "添加";
 
-"Please fill in the contents of the snippet" = "Please fill in the contents of the snippet";
+"Please fill in the contents of the snippet" = "请填写片段内容。";
 
-"Please allow Accessibility" = "Please allow Accessibility.";
+"Please allow Accessibility" = "请允许辅助功能。";
 
-"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "To do this action please allow Accessibility in Security & Privacy preferences, located in System Preferences.";
+"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "要执行此操作，请在系统设置的“安全性与隐私”首选项中允许辅助功能。";
 
-"Open System Preferences" = "Open System Preferences";
+"Open System Preferences" = "打开系统设置";
 
-"Add Folder" = "Add Folder";
-"Add Snippet" = "Add Snippet";
-"Delete" = "Delete";
-"Enable/Disable" = "Enable/Disable";
-"Import CSV" = "Import CSV";
-"Export CSV" = "Export CSV";
+"Add Folder" = "添加文件夹";
+"Add Snippet" = "添加片段";
+"Delete" = "删除";
+"Enable/Disable" = "启用/禁用";
+"Import CSV" = "导入 CSV";
+"Export CSV" = "导出 CSV";
 
-"Image" = "(Image)";
-"PDF" = "(PDF)";
-"Filenames" = "(Filenames)";
-"Exclude" = "Exclude";
+"Image" = "图像";
+"PDF" = "PDF";
+"Filenames" = "文件名";
+"Exclude" = "排除";
 
-"Untitled Folder" = "untitled folder";
-"Untitled Snippet" = "untitled snippet";
+"Untitled Folder" = "未命名文件夹";
+"Untitled Snippet" = "未命名片段";
 
 // Preferences
-"Remember history size" = "Remember history size";
-"Order after pasting" = "Order after pasting";
-"Move to top" = "Move to top";
-"Status bar icon" = "Status bar icon";
-"Black" = "Solid";
-"White" = "Line";
-"Color" = "App Icon";
-"None" = "None";
-"Send crash reports & error logs" = "Send crash reports & error logs";
-"Number of items place inline" = "Number of items place inline";
-"Number of items inside a folder" = "Number of items inside a folder";
-"Max characters in the menu" = "Max characters in the menu";
-"Mark menu items with numbers" = "Mark menu items with numbers";
-"Display icons in menu items" = "Display icons in menu items";
-"Show tool tip on a menu item" = "Show tool tip on a menu item";
-"Max length of tool tip" = "Max length of tool tip";
-"Show color code preview" = "Show color code preview";
-"Show Image" = "Show Image";
-"Width" = "Width";
-"Height" = "Height";
-"Select clipboard types to store:" = "Select clipboard types to store:";
-"Exclude these applications:" = "Exclude these applications:";
+"Remember history size" = "记住历史记录数量";
+"Order after pasting" = "粘贴后的顺序";
+"Move to top" = "移至顶部";
+"Status bar icon" = "状态栏图标";
+"Black" = "实心";
+"White" = "线条";
+"Color" = "应用图标";
+"None" = "无";
+"Send crash reports & error logs" = "发送崩溃报告和错误日志";
+"Number of items place inline" = "内联显示项目数量";
+"Number of items inside a folder" = "文件夹内项目数量";
+"Max characters in the menu" = "菜单最大字符数";
+"Mark menu items with numbers" = "用数字标记菜单项";
+"Display icons in menu items" = "在菜单项中显示图标";
+"Show tool tip on a menu item" = "在菜单项上显示工具提示";
+"Max length of tool tip" = "工具提示最大长度";
+"Show color code preview" = "显示颜色代码预览";
+"Show Image" = "显示图像";
+"Width" = "宽度";
+"Height" = "高度";
+"Select clipboard types to store:" = "选择要存储的剪贴板类型：";
+"Exclude these applications:" = "排除这些应用程序：";
 
-"Monitoring Speed" = "Clipboard Monitoring Speed";
-"High Speed (0.2s)" = "High Speed (0.2s)";
-"Fast (0.5s)" = "Fast (0.5s)";
-"Standard (0.75s)" = "Standard (0.75s)";
-"Power Saving (1.0s)" = "Power Saving (1.0s)";
+"Monitoring Speed" = "剪贴板监控速度";
+"High Speed (0.2s)" = "高速 (0.2s)";
+"Fast (0.5s)" = "较快 (0.5s)";
+"Standard (0.75s)" = "标准 (0.75s)";
+"Power Saving (1.0s)" = "省电 (1.0s)";
 
 "Language" = "语言设置";
 "System Language" = "系统语言";
@@ -114,10 +114,10 @@
 "Italian" = "意大利语";
 "Simplified Chinese" = "简体中文";
 
-"Plain Text" = "Plain Text";
-"Rich Text Format (RTF)" = "Rich Text Format (RTF)";
-"Rich Text Format Directory (RTFD)" = "Rich Text Format Directory (RTFD)";
+"Plain Text" = "纯文本";
+"Rich Text Format (RTF)" = "富文本格式 (RTF)";
+"Rich Text Format Directory (RTFD)" = "富文本目录格式 (RTFD)";
 "PDF" = "PDF";
-"Filenames" = "Filenames";
+"Filenames" = "文件名";
 "URL" = "URL";
-"TIFF Image" = "TIFF Image";
+"TIFF Image" = "TIFF 图像";

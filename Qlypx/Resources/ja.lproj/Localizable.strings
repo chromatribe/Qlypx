@@ -10,23 +10,23 @@
 //  Copyright © 2015-2018 Qlypx Project.
 //
 
-"Launch Qlypx on system startup?" = "システム起動時にQlypxを起動しますか?";
+"Launch Qlypx on system startup?" = "システム起動時にQlypxを起動しますか？";
 
-"You can change this setting in the Preferences if you want" = "この設定はいつでも変更できます";
+"You can change this setting in the Preferences if you want" = "この設定は後で設定画面から変更できます。";
 
-"Launch on system startup" = "起動する";
+"Launch on system startup" = "システム起動時に起動する";
 
 "Don't Launch" = "起動しない";
 
 "Clear History" = "履歴をクリア";
 
-"Are you sure you want to clear your clipboard history?" = "本当にクリップボード履歴をクリアしますか？";
+"Are you sure you want to clear your clipboard history?" = "クリップボードの履歴をクリアしてもよろしいですか？";
 
 "Cancel" = "キャンセル";
 
 "Edit Snippets" = "スニペットを編集...";
 
-"Preferences" = "環境設定...";
+"Preferences" = "設定...";
 
 "Quit Qlypx" = "Qlypxを終了";
 
@@ -47,64 +47,64 @@
 
 "Updates" = "アップデート";
 
-"Delete Item" = "スニペットを削除";
+"Delete Item" = "項目を削除";
 
-"Are you sure want to delete this item?" = "本当に削除してもよろしいですか？";
+"Are you sure want to delete this item?" = "この項目を削除してもよろしいですか？";
 
 "Add" = "追加";
 
-"Please fill in the contents of the snippet" = "スニペットの内容を記入してください";
+"Please fill in the contents of the snippet" = "スニペットの内容を入力してください。";
 
-"Please allow Accessibility" = "アクセシビリティを有効にしてください。";
+"Please allow Accessibility" = "アクセシビリティを許可してください。";
 
-"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "この動作を行うためにはシステム環境設定の\"セキュリティとプライバシー\"環境設定で、Qlypxへのアクセシビリティのアクセスを許可してください。";
+"To do this action please allow Accessibility in Security Privacy preferences located in System Preferences" = "この操作を行うには、システム設定の「セキュリティとプライバシー」でアクセシビリティを許可してください。";
 
-"Open System Preferences" = "\"システム環境設定\"を開く";
+"Open System Preferences" = "システム設定を開く";
 
-"Add Folder" = "フォルダ追加";
-"Add Snippet" = "スニペット追加";
+"Add Folder" = "フォルダを追加";
+"Add Snippet" = "スニペットを追加";
 "Delete" = "削除";
-"Enable/Disable" = "有効/無効の切り替え";
+"Enable/Disable" = "有効/無効";
 "Import CSV" = "CSVインポート";
 "Export CSV" = "CSVエクスポート";
 
-"Image" = "(画像)";
-"PDF" = "(PDFファイル)";
-"Filenames" = "(ファイルパス)";
-"Exclude" = "除外アプリ";
+"Image" = "画像";
+"PDF" = "PDF";
+"Filenames" = "ファイル名";
+"Exclude" = "除外";
 
 "Untitled Folder" = "無題のフォルダ";
 "Untitled Snippet" = "無題のスニペット";
 
 // Preferences
-"Remember history size" = "記憶する履歴の数";
-"Order after pasting" = "貼り付け後の履歴順序";
-"Move to top" = "最上部に移動";
-"Status bar icon" = "ステータスバーのアイコン";
+"Remember history size" = "履歴の保存数";
+"Order after pasting" = "貼り付け後の順序";
+"Move to top" = "一番上に移動";
+"Status bar icon" = "ステータスバーアイコン";
 "Black" = "ソリッド";
 "White" = "ライン";
 "Color" = "アプリアイコン";
 "None" = "なし";
 "Send crash reports & error logs" = "クラッシュレポートとエラーログを送信する";
-"Number of items place inline" = "インライン表示する項目の数";
-"Number of items inside a folder" = "フォルダに内包する項目の数";
-"Max characters in the menu" = "メニューに表示する文字数";
-"Mark menu items with numbers" = "メニュー項目に数字を振る";
+"Number of items place inline" = "インラインに表示する項目数";
+"Number of items inside a folder" = "フォルダ内に表示する項目数";
+"Max characters in the menu" = "メニューの最大文字数";
+"Mark menu items with numbers" = "メニュー項目に番号を付ける";
 "Display icons in menu items" = "メニュー項目にアイコンを表示する";
-"Show tool tip on a menu item" = "メニュー項目上にツールチップを表示";
-"Max length of tool tip" = "ツールチップに表示する文字数";
-"Show color code preview" = "カラーコードのプレビューを表示";
+"Show tool tip on a menu item" = "メニュー項目にツールチップを表示する";
+"Max length of tool tip" = "ツールチップの最大文字数";
+"Show color code preview" = "カラーコードのプレビューを表示する";
 "Show Image" = "画像を表示";
 "Width" = "幅";
 "Height" = "高さ";
-"Select clipboard types to store:" = "保存するクリップボードの形式を選択：";
-"Exclude these applications:" = "以下のアプリケーションを除外する：";
+"Select clipboard types to store:" = "保存するクリップボード形式を選択:";
+"Exclude these applications:" = "除外するアプリケーション:";
 
 "Monitoring Speed" = "クリップボード監視速度";
-"High Speed (0.2s)" = "高速（0.2s）";
-"Fast (0.5s)" = "速め（0.5s）";
-"Standard (0.75s)" = "基本（0.75s）";
-"Power Saving (1.0s)" = "省エネ（1.0s）";
+"High Speed (0.2s)" = "高速 (0.2s)";
+"Fast (0.5s)" = "速め (0.5s)";
+"Standard (0.75s)" = "基本 (0.75s)";
+"Power Saving (1.0s)" = "省エネ (1.0s)";
 
 "Language" = "言語設定";
 "System Language" = "システムの言語";

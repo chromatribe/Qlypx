@@ -1,5 +1,5 @@
 //
-//  CPYTypePreferenceViewController.swift
+//  QLYTypePreferenceViewController.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-class CPYTypePreferenceViewController: NSViewController {
+class QLYTypePreferenceViewController: NSViewController {
 
     // MARK: - Properties
     @objc var storeTypes: NSMutableDictionary!

@@ -1,5 +1,5 @@
 //
-//  CPYDesignableButton.swift
+//  QLYDesignableButton.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-class CPYDesignableButton: NSButton {
+class QLYDesignableButton: NSButton {
 
     @IBInspectable var textColor: NSColor = ColorName.title.color
 

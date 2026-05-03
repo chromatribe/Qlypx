@@ -1,5 +1,5 @@
 //
-//  CPYPlaceHolderTextView.swift
+//  QLYPlaceHolderTextView.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-class CPYPlaceHolderTextView: NSTextView {
+class QLYPlaceHolderTextView: NSTextView {
 
     // MARK: - Properties
     @IBInspectable var placeHolderColor: NSColor = .disabledControlTextColor {

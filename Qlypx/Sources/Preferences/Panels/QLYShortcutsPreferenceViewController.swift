@@ -1,5 +1,5 @@
 //
-//  CPYShortcutsPreferenceViewController.swift
+//  QLYShortcutsPreferenceViewController.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -14,7 +14,7 @@ import Cocoa
 import KeyHolder
 import Magnet
 
-class CPYShortcutsPreferenceViewController: NSViewController {
+class QLYShortcutsPreferenceViewController: NSViewController {
 
     // MARK: - Properties
     @IBOutlet private weak var mainShortcutRecordView: RecordView!
@@ -35,7 +35,7 @@ class CPYShortcutsPreferenceViewController: NSViewController {
 }
 
 // MARK: - Shortcut
-private extension CPYShortcutsPreferenceViewController {
+private extension QLYShortcutsPreferenceViewController {
     func prepareHotKeys() {
         mainShortcutRecordView.keyCombo = AppEnvironment.current.hotKeyService.mainKeyCombo
         historyShortcutRecordView.keyCombo = AppEnvironment.current.hotKeyService.historyKeyCombo
@@ -45,7 +45,7 @@ private extension CPYShortcutsPreferenceViewController {
 }
 
 // MARK: - RecordView Delegate
-extension CPYShortcutsPreferenceViewController: RecordViewDelegate {
+extension QLYShortcutsPreferenceViewController: RecordViewDelegate {
     func recordViewShouldBeginRecording(_ recordView: RecordView) -> Bool {
         return true
     }

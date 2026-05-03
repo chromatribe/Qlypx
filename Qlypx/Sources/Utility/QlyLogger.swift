@@ -54,7 +54,7 @@ final class DiagnosticService {
     private let reportURL = URL(string: "https://diagnostic-server-740119835332.asia-northeast1.run.app/report")!
     
     private var diagnosticFolder: String {
-        return CPYUtilities.applicationSupportFolder() + "/Diagnostic"
+        return QLYUtilities.applicationSupportFolder() + "/Diagnostic"
     }
     
     private var crashLogPath: String {
@@ -90,7 +90,7 @@ final class DiagnosticService {
     }
 
     fileprivate func saveCrashLog(_ report: String) {
-        if CPYUtilities.prepareSaveToPath(diagnosticFolder) {
+        if QLYUtilities.prepareSaveToPath(diagnosticFolder) {
             try? report.write(toFile: crashLogPath, atomically: true, encoding: .utf8)
         }
     }

@@ -3,7 +3,7 @@
 > **このファイルがプロジェクトの唯一の真実（Single Source of Truth）です。**
 > `GEMINI.md` はこのファイルへの入口として短く保ちます。
 
-**Current Version:** `1.20260504.1`
+**Current Version:** `1.20260504.2`
 
 ---
 
@@ -253,17 +253,21 @@ if type.isImage { ... }
 - **Phase 3 - Clipboard** - deprecated PasteboardType の排除、PDF/FileURL のモダン化
 - **Phase 3 - Diagnostics** - DiagnosticService（クラッシュ検知 + Web API 自動送信）、受信サーバー、**SlackNotificationService（エラー/クラッシュの Slack 即時通知）**
 - **Phase 4 - SwiftUI** - 設定画面、スニペットエディタの完全 SwiftUI 移行完了。
+- **Phase 4 - Optimization** - 重複コピー・上書きの UX 改善、DiagnosticServer のデプロイ完了。
+- **Phase 4 - Modernization** - プレフィックスの `QLY` 統一、メニュー構築の遅延初期化（パフォーマンス改善）完了。
 
 ### 🚧 進行中 / 未着手
 
-- [ ] `CPY` プレフィックスの `QLY` またはプレフィックスなしへのリネーム（優先度：低）
-- [ ] 設定項目のさらなる絞り込み（重複コピー・上書きの UX 改善）
-- [ ] DiagnosticServer のデプロイ（Vercel / 自前サーバー）と Webhook 接続
-- [ ] 履歴増大時のメニュー表示パフォーマンス改善
+- [ ] (なし)
 
 ---
 
 ## 5. Change Log
+### 1.20260504.2
+- **Refactor**: プロジェクト全体のプレフィックスを `CPY` から `QLY` へ刷新（`QLYClip`, `QLYFolder` 等）。
+- **Performance**: メインメニューの構築を遅延初期化（Lazy Loading）に変更。履歴増大時の表示パフォーマンスとコピー操作時の負荷を大幅に改善。
+- **Fix**: 設定画面に `import Combine` を追加し、ビルドエラーを修正。
+- **i18n**: 中国語（簡体字）のローカライズリソースを最新化。
 
 ### 1.20260504.1
 - **i18n**: 日本語ローカライズの文言をモダンなmacOSのスタイルに合わせ微調整（「環境設定」→「設定」など）。

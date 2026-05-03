@@ -1,5 +1,5 @@
 //
-//  CPYDraggedData.swift
+//  QLYDraggedData.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Foundation
 
-final class CPYDraggedData: NSObject, NSSecureCoding {
+final class QLYDraggedData: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { return true }
 
     // MARK: - Properties

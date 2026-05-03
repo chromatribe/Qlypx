@@ -9,15 +9,15 @@ final class PasteService {
 
 // MARK: - Copy
 extension PasteService {
-    func copyToPasteboard(with clip: CPYClip) {
+    func copyToPasteboard(with clip: QLYClip) {
         lock.lock(); defer { lock.unlock() }
 
-        let data: CPYClipData
+        let data: QLYClipData
         do {
             let fileData = try Data(contentsOf: URL(fileURLWithPath: clip.fullDataPath))
             let unarchiver = try NSKeyedUnarchiver(forReadingFrom: fileData)
             unarchiver.requiresSecureCoding = false
-            guard let decodedData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? CPYClipData else { return }
+            guard let decodedData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? QLYClipData else { return }
             data = decodedData
         } catch {
             QlyLogger.error("Failed to unarchive clip data for copy from \(clip.dataPath): \(error)", log: .clip)
@@ -83,7 +83,7 @@ extension PasteService {
         pasteboard.setString(string, forType: .string)
     }
 
-    func paste(with clip: CPYClip) {
+    func paste(with clip: QLYClip) {
         copyToPasteboard(with: clip)
         paste()
     }

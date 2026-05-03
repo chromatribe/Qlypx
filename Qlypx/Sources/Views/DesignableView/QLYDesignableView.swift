@@ -1,5 +1,5 @@
 //
-//  CPYDesignableView.swift
+//  QLYDesignableView.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -13,7 +13,7 @@
 import Foundation
 import Cocoa
 
-@IBDesignable class CPYDesignableView: NSView {
+@IBDesignable class QLYDesignableView: NSView {
 
     // MARK: - Properties
     @IBInspectable var backgroundColor: NSColor = .clear {

@@ -52,7 +52,7 @@ final class DataCleanService {
 
     private func cleanFiles() {
         let fileManager = FileManager.default
-        guard let paths = try? fileManager.contentsOfDirectory(atPath: CPYUtilities.applicationSupportFolder()) else { return }
+        guard let paths = try? fileManager.contentsOfDirectory(atPath: QLYUtilities.applicationSupportFolder()) else { return }
 
         let dataService = AppEnvironment.current.dataService
         let allClipPaths = Set(dataService.clips.compactMap { $0.dataPath.components(separatedBy: "/").last })
@@ -60,8 +60,8 @@ final class DataCleanService {
         // Delete diff datas
         DispatchQueue.main.async {
             paths.filter { $0.hasSuffix(".data") && !allClipPaths.contains($0) }
-                .map { CPYUtilities.applicationSupportFolder() + "/" + "\($0)" }
-                .forEach { CPYUtilities.deleteData(at: $0) }
+                .map { QLYUtilities.applicationSupportFolder() + "/" + "\($0)" }
+                .forEach { QLYUtilities.deleteData(at: $0) }
         }
     }
 }

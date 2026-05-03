@@ -1,5 +1,5 @@
 //
-//  CPYSplitView.swift
+//  QLYSplitView.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-class CPYSplitView: NSSplitView {
+class QLYSplitView: NSSplitView {
 
     // MARK: - Properties
     @IBInspectable var separatorColor: NSColor = .separatorColor {

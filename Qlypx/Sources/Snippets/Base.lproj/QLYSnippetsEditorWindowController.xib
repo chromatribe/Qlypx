@@ -5,7 +5,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0" />
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="CPYSnippetsEditorWindowController" customModule="Qlypx" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner" customClass="QLYSnippetsEditorWindowController" customModule="Qlypx" customModuleProvider="target">
             <connections>
                 <outlet property="folderSettingView" destination="Ygf-rF-MiG" id="yje-y2-5Su" />
                 <outlet property="folderShortcutRecordView" destination="zjO-0c-pwM" id="x7o-Yz-Zpe" />
@@ -26,7 +26,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="800" height="600" />
                 <autoresizingMask key="autoresizingMask" />
                 <subviews>
-                    <splitView arrangesAllSubviews="NO" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BiM-Ll-CfO" customClass="CPYSplitView" customModule="Qlypx" customModuleProvider="target">
+                    <splitView arrangesAllSubviews="NO" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BiM-Ll-CfO" customClass="QLYSplitView" customModule="Qlypx" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="800" height="600" />
                         <subviews>
                             <customView focusRingType="none" id="gSL-Od-RtU">
@@ -52,7 +52,7 @@
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog" />
                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog" />
                                                             </tableHeaderCell>
-                                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Text" id="J4q-sY-gcS" customClass="CPYSnippetsEditorCell" customModule="Qlypx" customModuleProvider="target">
+                                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Text" id="J4q-sY-gcS" customClass="QLYSnippetsEditorCell" customModule="Qlypx" customModuleProvider="target">
                                                                 <font key="font" metaFont="system" />
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog" />
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog" />
@@ -95,7 +95,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="549" height="544" />
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" />
                                             <subviews>
-                                                <textView hidden="YES" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="Sg6-q3-8Kx" customClass="CPYPlaceHolderTextView" customModule="Qlypx" customModuleProvider="target">
+                                                <textView hidden="YES" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="Sg6-q3-8Kx" customClass="QLYPlaceHolderTextView" customModule="Qlypx" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="549" height="544" />
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" />
                                                     <color key="backgroundColor" red="0.9882352941176471" green="0.9882352941176471" blue="0.9882352941176471" alpha="1" colorSpace="calibratedRGB" />
@@ -124,7 +124,7 @@
                                             <autoresizingMask key="autoresizingMask" />
                                         </scroller>
                                     </scrollView>
-                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ygf-rF-MiG" customClass="CPYDesignableView" customModule="Qlypx" customModuleProvider="target">
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ygf-rF-MiG" customClass="QLYDesignableView" customModule="Qlypx" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="549" height="544" />
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="H8F-IV-Fl5">
@@ -171,7 +171,7 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
-                                                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hSp-7i-idd" customClass="CPYDesignableView" customModule="Qlypx" customModuleProvider="target">
+                                                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hSp-7i-idd" customClass="QLYDesignableView" customModule="Qlypx" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="80" width="250" height="1"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <userDefinedRuntimeAttributes>

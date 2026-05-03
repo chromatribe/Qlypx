@@ -1,5 +1,5 @@
 //
-//  CPYClip.swift
+//  QLYClip.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,7 +12,7 @@
 
 import Cocoa
 
-final class CPYClip: Codable {
+final class QLYClip: Codable {
     var dataPath: String = ""
     var title: String = ""
     var dataHash: String = ""
@@ -24,7 +24,7 @@ final class CPYClip: Codable {
     var fullDataPath: String {
         if dataPath.isEmpty { return "" }
         if dataPath.hasPrefix("/") { return dataPath }
-        return (CPYUtilities.applicationSupportFolder() as NSString).appendingPathComponent(dataPath)
+        return (QLYUtilities.applicationSupportFolder() as NSString).appendingPathComponent(dataPath)
     }
 
     init(dataPath: String = "", title: String = "", dataHash: String = "", primaryType: String = "", updateTime: Int = 0, thumbnailPath: String = "", isColorCode: Bool = false) {

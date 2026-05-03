@@ -180,7 +180,7 @@ extension L10n {
 
 private final class BundleToken {
   static var bundle: Bundle {
-    let language = UserDefaults.standard.string(forKey: "kCPYPrefLanguageKey") ?? "System"
+    let language = UserDefaults.standard.string(forKey: "kQLYPrefLanguageKey") ?? "System"
     if language == "System" {
         return Bundle(for: BundleToken.self)
     }

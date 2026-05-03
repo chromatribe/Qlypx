@@ -1,5 +1,5 @@
 //
-//  CPYFolder.swift
+//  QLYFolder.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,13 +12,13 @@
 
 import Cocoa
 
-final class CPYFolder: Codable, Equatable, Hashable, Identifiable, ObservableObject {
+final class QLYFolder: Codable, Equatable, Hashable, Identifiable, ObservableObject {
     var id: String { identifier }
     @Published var index: Int = 0
     @Published var enable: Bool = true
     @Published var title: String = ""
     var identifier: String = UUID().uuidString
-    @Published var snippets: [CPYSnippet] = []
+    @Published var snippets: [QLYSnippet] = []
 
     enum CodingKeys: String, CodingKey {
         case index
@@ -28,7 +28,7 @@ final class CPYFolder: Codable, Equatable, Hashable, Identifiable, ObservableObj
         case snippets
     }
 
-    init(index: Int = 0, enable: Bool = true, title: String = "", identifier: String = UUID().uuidString, snippets: [CPYSnippet] = []) {
+    init(index: Int = 0, enable: Bool = true, title: String = "", identifier: String = UUID().uuidString, snippets: [QLYSnippet] = []) {
         self.index = index
         self.enable = enable
         self.title = title
@@ -42,7 +42,7 @@ final class CPYFolder: Codable, Equatable, Hashable, Identifiable, ObservableObj
         enable = try container.decode(Bool.self, forKey: .enable)
         title = try container.decode(String.self, forKey: .title)
         identifier = try container.decode(String.self, forKey: .identifier)
-        snippets = try container.decode([CPYSnippet].self, forKey: .snippets)
+        snippets = try container.decode([QLYSnippet].self, forKey: .snippets)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -54,7 +54,7 @@ final class CPYFolder: Codable, Equatable, Hashable, Identifiable, ObservableObj
         try container.encode(snippets, forKey: .snippets)
     }
 
-    static func == (lhs: CPYFolder, rhs: CPYFolder) -> Bool {
+    static func == (lhs: QLYFolder, rhs: QLYFolder) -> Bool {
         return lhs.identifier == rhs.identifier
     }
 
@@ -64,17 +64,17 @@ final class CPYFolder: Codable, Equatable, Hashable, Identifiable, ObservableObj
 }
 
 // MARK: - Copy
-extension CPYFolder {
-    func deepCopy() -> CPYFolder {
-        let copiedSnippets = snippets.map { CPYSnippet(index: $0.index, enable: $0.enable, title: $0.title, content: $0.content, identifier: $0.identifier) }
-        return CPYFolder(index: index, enable: enable, title: title, identifier: identifier, snippets: copiedSnippets)
+extension QLYFolder {
+    func deepCopy() -> QLYFolder {
+        let copiedSnippets = snippets.map { QLYSnippet(index: $0.index, enable: $0.enable, title: $0.title, content: $0.content, identifier: $0.identifier) }
+        return QLYFolder(index: index, enable: enable, title: title, identifier: identifier, snippets: copiedSnippets)
     }
 }
 
 // MARK: - Actions
-extension CPYFolder {
-    static func create() -> CPYFolder {
-        let folder = CPYFolder()
+extension QLYFolder {
+    static func create() -> QLYFolder {
+        let folder = QLYFolder()
         folder.title = L10n.untitledFolder
         let lastFolder = AppEnvironment.current.dataService.folders.sorted(by: { $0.index < $1.index }).last
         folder.index = (lastFolder?.index ?? -1) + 1
@@ -89,21 +89,21 @@ extension CPYFolder {
         AppEnvironment.current.dataService.deleteFolder(with: identifier)
     }
 
-    func createSnippet() -> CPYSnippet {
-        let snippet = CPYSnippet()
+    func createSnippet() -> QLYSnippet {
+        let snippet = QLYSnippet()
         snippet.title = L10n.untitledSnippet
         snippet.index = snippets.count
         return snippet
     }
 
-    func mergeSnippet(_ snippet: CPYSnippet) {
+    func mergeSnippet(_ snippet: QLYSnippet) {
         if !snippets.contains(where: { $0.identifier == snippet.identifier }) {
             snippets.append(snippet)
         }
         merge()
     }
 
-    func insertSnippet(_ snippet: CPYSnippet, index: Int) {
+    func insertSnippet(_ snippet: QLYSnippet, index: Int) {
         if let existingIndex = snippets.firstIndex(where: { $0.identifier == snippet.identifier }) {
             snippets.remove(at: existingIndex)
         }
@@ -112,13 +112,13 @@ extension CPYFolder {
         merge()
     }
 
-    func removeSnippet(_ snippet: CPYSnippet) {
+    func removeSnippet(_ snippet: QLYSnippet) {
         snippets.removeAll(where: { $0.identifier == snippet.identifier })
         rearrangesSnippetIndex()
         merge()
     }
 
-    static func rearrangesIndex(_ folders: [CPYFolder]) {
+    static func rearrangesIndex(_ folders: [QLYFolder]) {
         for (index, folder) in folders.enumerated() {
             folder.index = index
             folder.merge()

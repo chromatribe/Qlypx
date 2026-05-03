@@ -1,5 +1,5 @@
 //
-//  CPYUtilities.swift
+//  QLYUtilities.swift
 //
 //  Qlypx
 //  GitHub: https://github.com/qlypx
@@ -12,14 +12,14 @@
 
 import Cocoa
 
-final class CPYUtilities {
+final class QLYUtilities {
 
     static func initSDKs() {
         // Fabric
         AppEnvironment.current.defaults.register(defaults: ["NSApplicationCrashOnExceptions": true])
         guard AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.collectCrashReport) else { return }
         // TODO: - Migrate Firebase Crashlytics
-        CPYUtilities.sendCustomLog(with: "applicationDidFinishLaunching")
+        QLYUtilities.sendCustomLog(with: "applicationDidFinishLaunching")
     }
 
     static func registerUserDefaultKeys() {
